@@ -25,7 +25,7 @@ const INITIAL_PRODUCTS = [
     name: 'REALCENOVA Golf T-Shirt',
     price: 559.99,
     category: 'Apparel',
-    image: 'https://i.ibb.co/6y1820Z/golf-shirt-realcenova.png', // Corrected Golf Polo Image
+    image: 'https://lh3.googleusercontent.com/d/1hmgg66mxILONx9NFJkLP2AZirxfaO4NP',
     hasOptions: true,
     colors: ['White', 'Black', 'Navy', 'Off-White'],
     sizes: ['S', 'M', 'L', 'XL', 'XXL']
@@ -45,7 +45,7 @@ const INITIAL_PRODUCTS = [
     name: 'REALCENOVA "Cowboy" Front & Back T-Shirt',
     price: 449.99,
     category: 'Apparel',
-    image: 'https://i.ibb.co/3mN9K5P/front-back-cowboy.jpg', // Corrected Front & Back Showcase Image
+    image: 'https://lh3.googleusercontent.com/d/1hmgg66mxILONx9NFJkLP2AZirxfaO4NP',
     hasOptions: true,
     colors: ['White'],
     sizes: ['S', 'M', 'L', 'XL', 'XXL']
