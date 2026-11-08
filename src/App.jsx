@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShoppingBag, QrCode, Lock, LogOut, Plus, Trash2, X, User, CheckCircle } from 'lucide-react';
+import { ShoppingBag, QrCode, Lock, LogOut, Plus, Trash2, X, User, CheckCircle, Building, Truck } from 'lucide-react';
 
 export default function App() {
   const [view, setView] = useState('store');
@@ -9,15 +9,22 @@ export default function App() {
   const [storeUrl, setStoreUrl] = useState('https://realcenova-store.vercel.app');
   
   // Customer Auth State
-  const [customer, setCustomer] = useState(null); // { name, email }
-  const [authMode, setAuthMode] = useState('login'); // 'login' | 'signup'
+  const [customer, setCustomer] = useState(null);
+  const [authMode, setAuthMode] = useState('login');
   const [authForm, setAuthForm] = useState({ name: '', email: '', password: '' });
+
+  // Options State for Apparel & Footwear Selection
+  const [selectedSizes, setSelectedSizes] = useState({});
+  const [selectedColors, setSelectedColors] = useState({});
 
   // Cart & Checkout State
   const [cart, setCart] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [checkoutStep, setCheckoutStep] = useState(1);
   const [orderComplete, setOrderComplete] = useState(false);
+  const [paymentRef, setPaymentRef] = useState('');
+  const [recentOrder, setRecentOrder] = useState(null);
   
   const [shippingAddress, setShippingAddress] = useState({
     fullName: '',
@@ -35,49 +42,66 @@ export default function App() {
       name: 'REALCENOVA Leather Slides (Gold Emblem)',
       price: 949.99,
       category: 'Footwear',
-      image: 'https://lh3.googleusercontent.com/d/11fJbgsvzLFUpPv977OHwq98gN_ns6b5z'
+      image: 'https://lh3.googleusercontent.com/d/11fJbgsvzLFUpPv977OHwq98gN_ns6b5z',
+      hasOptions: true,
+      sizes: ['5', '6', '7', '8', '9', '10', '11']
     },
     {
       id: 2,
       name: 'REALCENOVA Leather Slides (Stitched Patch)',
       price: 949.99,
       category: 'Footwear',
-      image: 'https://lh3.googleusercontent.com/d/1INdiML6Z7pslhVyYN6kBFMqH2Rs--54S'
+      image: 'https://lh3.googleusercontent.com/d/1INdiML6Z7pslhVyYN6kBFMqH2Rs--54S',
+      hasOptions: true,
+      sizes: ['5', '6', '7', '8', '9', '10', '11']
     },
     {
       id: 3,
       name: 'REALCENOVA Golf T-Shirt',
       price: 1200.00,
       category: 'Apparel',
-      image: 'https://lh3.googleusercontent.com/d/1hmgg66mxILONx9NFJkLP2AZirxfaO4NP'
+      image: 'https://lh3.googleusercontent.com/d/1hmgg66mxILONx9NFJkLP2AZirxfaO4NP',
+      hasOptions: true,
+      colors: ['White', 'Black', 'Navy', 'Off-White'],
+      sizes: ['S', 'M', 'L', 'XL', 'XXL']
     },
     {
       id: 4,
       name: 'REALCENOVA Round Neck T-Shirt',
       price: 799.99,
       category: 'Apparel',
-      image: 'https://lh3.googleusercontent.com/d/1hmgg66mxILONx9NFJkLP2AZirxfaO4NP'
+      image: 'https://lh3.googleusercontent.com/d/1hmgg66mxILONx9NFJkLP2AZirxfaO4NP',
+      hasOptions: true,
+      colors: ['White', 'Black', 'Navy', 'Grey'],
+      sizes: ['S', 'M', 'L', 'XL', 'XXL']
     },
     {
       id: 5,
       name: 'REALCENOVA Gold Watch',
       price: 1900.00,
       category: 'Watches',
-      image: 'https://lh3.googleusercontent.com/d/1zbZzfsA1LQzxO005N93aYLjuLiSKnhHK'
+      image: 'https://lh3.googleusercontent.com/d/1zbZzfsA1LQzxO005N93aYLjuLiSKnhHK',
+      hasOptions: false
     },
     {
       id: 6,
       name: 'REALCENOVA Classic Denim Jeans (Blue)',
       price: 2799.99,
       category: 'Apparel',
-      image: 'https://lh3.googleusercontent.com/d/1v1nmaNrfAp7ZDZZU2cG2T6kNyzuTyN7u'
+      image: 'https://lh3.googleusercontent.com/d/1v1nmaNrfAp7ZDZZU2cG2T6kNyzuTyN7u',
+      hasOptions: true,
+      colors: ['Blue'],
+      sizes: ['28', '30', '32', '34', '36']
     },
     {
       id: 7,
       name: 'REALCENOVA Classic Denim Jeans (Black)',
       price: 2799.99,
       category: 'Apparel',
-      image: 'https://lh3.googleusercontent.com/d/1pdUt7tFp7aGNI37vUG5gPXcEt9d7eZ9u'
+      image: 'https://lh3.googleusercontent.com/d/1pdUt7tFp7aGNI37vUG5gPXcEt9d7eZ9u',
+      hasOptions: true,
+      colors: ['Black'],
+      sizes: ['28', '30', '32', '34', '36']
     }
   ]);
 
@@ -85,23 +109,27 @@ export default function App() {
 
   // Cart Handlers
   const addToCart = (product) => {
-    const existing = cart.find(item => item.id === product.id);
+    const size = selectedSizes[product.id] || (product.sizes ? product.sizes[0] : '');
+    const color = selectedColors[product.id] || (product.colors ? product.colors[0] : '');
+    const cartItemId = `${product.id}-${size}-${color}`;
+
+    const existing = cart.find(item => item.cartItemId === cartItemId);
     if (existing) {
-      setCart(cart.map(item => item.id === product.id ? { ...item, qty: item.qty + 1 } : item));
+      setCart(cart.map(item => item.cartItemId === cartItemId ? { ...item, qty: item.qty + 1 } : item));
     } else {
-      setCart([...cart, { ...product, qty: 1 }]);
+      setCart([...cart, { ...product, cartItemId, selectedSize: size, selectedColor: color, qty: 1 }]);
     }
     setIsCartOpen(true);
   };
 
-  const removeFromCart = (id) => {
-    setCart(cart.filter(item => item.id !== id));
+  const removeFromCart = (cartItemId) => {
+    setCart(cart.filter(item => item.cartItemId !== cartItemId));
   };
 
   const cartTotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
   const cartCount = cart.reduce((sum, item) => sum + item.qty, 0);
 
-  // Customer Authentication Handlers
+  // Customer Auth Handlers
   const handleAuth = (e) => {
     e.preventDefault();
     if (authMode === 'signup') {
@@ -137,8 +165,24 @@ export default function App() {
     setProducts(products.filter(p => p.id !== id));
   };
 
-  const handlePlaceOrder = (e) => {
+  const handleProceedToPayment = (e) => {
     e.preventDefault();
+    setCheckoutStep(2);
+  };
+
+  const handleFinalizeOrder = (e) => {
+    e.preventDefault();
+    const orderData = {
+      orderId: 'RC-' + Math.floor(100000 + Math.random() * 900000),
+      customer: customer ? customer.name : shippingAddress.fullName,
+      phone: shippingAddress.phone,
+      address: `${shippingAddress.street}, ${shippingAddress.suburb}, ${shippingAddress.city}, ${shippingAddress.postalCode}`,
+      items: cart,
+      total: cartTotal,
+      ref: paymentRef,
+      date: new Date().toLocaleDateString()
+    };
+    setRecentOrder(orderData);
     setOrderComplete(true);
     setCart([]);
   };
@@ -189,15 +233,63 @@ export default function App() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {products.map(p => (
-                <div key={p.id} className="border border-neutral-900 bg-neutral-950/50 group overflow-hidden">
-                  <div className="h-80 overflow-hidden bg-neutral-900">
-                    <img src={p.image} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                <div key={p.id} className="border border-neutral-900 bg-neutral-950/50 group overflow-hidden flex flex-col justify-between">
+                  <div>
+                    <div className="h-80 overflow-hidden bg-neutral-900">
+                      <img src={p.image} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                    </div>
+                    <div className="p-6">
+                      <span className="text-xs text-neutral-500 tracking-widest uppercase">{p.category}</span>
+                      <h3 className="text-lg font-light tracking-wide mt-1">{p.name}</h3>
+                      <p className="text-neutral-300 mt-2 font-medium">R {p.price.toFixed(2)}</p>
+
+                      {/* Customization Options (Color / Size) */}
+                      {p.hasOptions && (
+                        <div className="mt-4 space-y-3 pt-4 border-t border-neutral-900">
+                          {p.colors && (
+                            <div>
+                              <label className="text-[10px] text-neutral-400 uppercase tracking-widest block mb-1">Color</label>
+                              <div className="flex gap-2 flex-wrap">
+                                {p.colors.map(c => (
+                                  <button
+                                    key={c}
+                                    type="button"
+                                    onClick={() => setSelectedColors({ ...selectedColors, [p.id]: c })}
+                                    className={`px-2 py-1 text-xs border ${ (selectedColors[p.id] || p.colors[0]) === c ? 'border-white text-white bg-neutral-800' : 'border-neutral-800 text-neutral-500'}`}
+                                  >
+                                    {c}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {p.sizes && (
+                            <div>
+                              <label className="text-[10px] text-neutral-400 uppercase tracking-widest block mb-1">
+                                {p.category === 'Footwear' ? 'Shoe Size (UK)' : 'Size'}
+                              </label>
+                              <div className="flex gap-1.5 flex-wrap">
+                                {p.sizes.map(s => (
+                                  <button
+                                    key={s}
+                                    type="button"
+                                    onClick={() => setSelectedSizes({ ...selectedSizes, [p.id]: s })}
+                                    className={`px-2 py-1 text-xs border ${ (selectedSizes[p.id] || p.sizes[0]) === s ? 'border-white text-white bg-neutral-800' : 'border-neutral-800 text-neutral-500'}`}
+                                  >
+                                    {s}
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  <div className="p-6">
-                    <span className="text-xs text-neutral-500 tracking-widest uppercase">{p.category}</span>
-                    <h3 className="text-lg font-light tracking-wide mt-1">{p.name}</h3>
-                    <p className="text-neutral-300 mt-2">R {p.price.toFixed(2)}</p>
-                    <button onClick={() => addToCart(p)} className="w-full mt-6 bg-white text-black py-3 text-xs tracking-[0.2em] uppercase hover:bg-neutral-200 transition">Add to Bag</button>
+
+                  <div className="p-6 pt-0">
+                    <button onClick={() => addToCart(p)} className="w-full bg-white text-black py-3 text-xs tracking-[0.2em] uppercase hover:bg-neutral-200 transition">Add to Bag</button>
                   </div>
                 </div>
               ))}
@@ -335,13 +427,18 @@ export default function App() {
                 <p className="text-neutral-500 text-center py-12 tracking-wide text-sm">Your shopping bag is empty.</p>
               ) : (
                 cart.map(item => (
-                  <div key={item.id} className="flex gap-4 border-b border-neutral-900 pb-4 items-center">
+                  <div key={item.cartItemId} className="flex gap-4 border-b border-neutral-900 pb-4 items-center">
                     <img src={item.image} alt={item.name} className="w-16 h-16 object-cover bg-neutral-900" />
                     <div className="flex-1">
                       <h4 className="text-sm font-light">{item.name}</h4>
+                      {(item.selectedColor || item.selectedSize) && (
+                        <p className="text-[11px] text-neutral-400 mt-0.5">
+                          {item.selectedColor && `Color: ${item.selectedColor}`} {item.selectedSize && `| Size: ${item.selectedSize}`}
+                        </p>
+                      )}
                       <p className="text-xs text-neutral-400 mt-1">R {item.price.toFixed(2)} x {item.qty}</p>
                     </div>
-                    <button onClick={() => removeFromCart(item.id)} className="text-neutral-500 hover:text-red-400"><Trash2 size={16}/></button>
+                    <button onClick={() => removeFromCart(item.cartItemId)} className="text-neutral-500 hover:text-red-400"><Trash2 size={16}/></button>
                   </div>
                 ))
               )}
@@ -354,7 +451,7 @@ export default function App() {
                   <span>R {cartTotal.toFixed(2)}</span>
                 </div>
                 <button 
-                  onClick={() => { setIsCartOpen(false); setIsCheckoutOpen(true); }} 
+                  onClick={() => { setIsCartOpen(false); setIsCheckoutOpen(true); setCheckoutStep(1); }} 
                   className="w-full bg-white text-black py-4 text-xs tracking-[0.2em] uppercase hover:bg-neutral-200 transition"
                 >
                   Proceed to Delivery & Checkout
@@ -365,24 +462,36 @@ export default function App() {
         </div>
       )}
 
-      {/* Checkout & Shipping Address Modal */}
+      {/* Checkout, Delivery & EFT Payment Modal */}
       {isCheckoutOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
           <div className="max-w-2xl w-full bg-neutral-950 border border-neutral-900 p-8 my-8 relative">
-            <button onClick={() => { setIsCheckoutOpen(false); setOrderComplete(false); }} className="absolute top-6 right-6 text-neutral-400 hover:text-white"><X size={20}/></button>
+            <button onClick={() => { setIsCheckoutOpen(false); setOrderComplete(false); setCheckoutStep(1); }} className="absolute top-6 right-6 text-neutral-400 hover:text-white"><X size={20}/></button>
 
             {orderComplete ? (
               <div className="text-center py-8">
                 <CheckCircle size={48} className="mx-auto text-emerald-400 mb-4" />
                 <h3 className="text-2xl font-light tracking-widest mb-2">ORDER PLACED SUCCESSFULLY</h3>
-                <p className="text-neutral-400 text-sm mb-6">Thank you for your order with REALCENOVA. A confirmation and tracking link will be sent to your email.</p>
-                <button onClick={() => { setIsCheckoutOpen(false); setOrderComplete(false); setView('store'); }} className="bg-white text-black px-8 py-3 text-xs tracking-[0.2em] uppercase hover:bg-neutral-200 transition">Return to Store</button>
+                <p className="text-neutral-400 text-sm mb-4">Order Reference Number: <strong className="text-white">{recentOrder?.orderId}</strong></p>
+                <div className="bg-neutral-900/60 p-4 border border-neutral-800 text-xs text-neutral-300 text-left mb-6 space-y-1 font-mono">
+                  <p><strong>Recipient:</strong> {recentOrder?.customer} ({recentOrder?.phone})</p>
+                  <p><strong>Address:</strong> {recentOrder?.address}</p>
+                  <p><strong>Payment Ref:</strong> {recentOrder?.ref}</p>
+                  <p><strong>Estimated Delivery:</strong> 5–7 Working Days</p>
+                </div>
+                <button onClick={() => { setIsCheckoutOpen(false); setOrderComplete(false); setCheckoutStep(1); setView('store'); }} className="bg-white text-black px-8 py-3 text-xs tracking-[0.2em] uppercase hover:bg-neutral-200 transition">Return to Store</button>
               </div>
-            ) : (
+            ) : checkoutStep === 1 ? (
               <div>
-                <h3 className="text-xl font-light tracking-widest uppercase mb-6">Delivery Details & Checkout</h3>
+                <h3 className="text-xl font-light tracking-widest uppercase mb-4">Step 1: Delivery Details</h3>
                 
-                <form onSubmit={handlePlaceOrder} className="space-y-6">
+                {/* Delivery Timeframe Notice */}
+                <div className="flex items-center gap-3 bg-neutral-900/80 border border-neutral-800 p-3 mb-6 text-xs text-neutral-300">
+                  <Truck size={18} className="text-white shrink-0" />
+                  <span><strong>Standard Delivery:</strong> Delivered within <strong>5 to 7 Working Days</strong> via door-to-door courier.</span>
+                </div>
+
+                <form onSubmit={handleProceedToPayment} className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="text-xs text-neutral-400 tracking-widest uppercase block mb-2">Recipient Full Name</label>
@@ -414,25 +523,53 @@ export default function App() {
                     </div>
                   </div>
 
-                  <div className="border-t border-neutral-900 pt-6 mt-6">
-                    <h4 className="text-xs text-neutral-400 tracking-widest uppercase mb-3">Order Summary</h4>
-                    <div className="space-y-2 text-sm mb-4">
-                      {cart.map(i => (
-                        <div key={i.id} className="flex justify-between text-neutral-300">
-                          <span>{i.name} (x{i.qty})</span>
-                          <span>R {(i.price * i.qty).toFixed(2)}</span>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="flex justify-between font-light text-base border-t border-neutral-900 pt-3">
-                      <span>Total Due</span>
-                      <span>R {cartTotal.toFixed(2)}</span>
-                    </div>
+                  <button type="submit" className="w-full bg-white text-black py-4 text-xs tracking-[0.2em] uppercase hover:bg-neutral-200 transition">
+                    Continue to Payment
+                  </button>
+                </form>
+              </div>
+            ) : (
+              <div>
+                <h3 className="text-xl font-light tracking-widest uppercase mb-4">Step 2: Payment (Direct EFT Transfer)</h3>
+                
+                <div className="border border-neutral-900 bg-neutral-900/40 p-6 mb-6">
+                  <div className="flex items-center gap-2 mb-4 text-neutral-300">
+                    <Building size={18} />
+                    <span className="text-sm uppercase tracking-wider font-medium">REALCENOVA Banking Details</span>
+                  </div>
+                  <div className="space-y-2 text-xs text-neutral-400 font-mono">
+                    <p><strong className="text-neutral-200">Bank Name:</strong> Capitec Bank / FNB</p>
+                    <p><strong className="text-neutral-200">Account Name:</strong> REALCENOVA STORE</p>
+                    <p><strong className="text-neutral-200">Account Number:</strong> 1234 5678 901</p>
+                    <p><strong className="text-neutral-200">Branch Code:</strong> 470010</p>
+                    <p><strong className="text-neutral-200">Reference:</strong> {shippingAddress.phone || 'Your Phone Number'}</p>
+                    <p className="text-white text-sm font-sans mt-3 border-t border-neutral-800 pt-2 font-light">
+                      Total Payable: <strong className="text-emerald-400">R {cartTotal.toFixed(2)}</strong>
+                    </p>
+                  </div>
+                </div>
+
+                <form onSubmit={handleFinalizeOrder} className="space-y-6">
+                  <div>
+                    <label className="text-xs text-neutral-400 tracking-widest uppercase block mb-2">Payment Reference / Transaction ID</label>
+                    <input 
+                      type="text" 
+                      value={paymentRef} 
+                      onChange={e => setPaymentRef(e.target.value)} 
+                      className="w-full bg-black border border-neutral-800 p-3 text-sm focus:outline-none focus:border-white" 
+                      placeholder="Enter EFT Ref or Payment Confirmation No." 
+                      required 
+                    />
                   </div>
 
-                  <button type="submit" className="w-full bg-white text-black py-4 text-xs tracking-[0.2em] uppercase hover:bg-neutral-200 transition">
-                    Complete Order
-                  </button>
+                  <div className="flex gap-4">
+                    <button type="button" onClick={() => setCheckoutStep(1)} className="w-1/3 border border-neutral-800 text-neutral-400 py-4 text-xs tracking-[0.2em] uppercase hover:text-white transition">
+                      Back
+                    </button>
+                    <button type="submit" className="w-2/3 bg-white text-black py-4 text-xs tracking-[0.2em] uppercase hover:bg-neutral-200 transition">
+                      Confirm & Complete Order
+                    </button>
+                  </div>
                 </form>
               </div>
             )}
