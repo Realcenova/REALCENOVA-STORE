@@ -1,5 +1,53 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingBag, QrCode, Lock, LogOut, Plus, Trash2, X, User, CheckCircle, Building, Truck, Bell, PackageCheck, Eye, Edit2, Check, ImageOff } from 'lucide-react';
+import { ShoppingBag, QrCode, Lock, LogOut, Plus, Trash2, X, User, CheckCircle, Building, Truck, Bell, PackageCheck, Eye, Edit2, Check } from 'lucide-react';
+
+// Custom Self-Contained SVG Renderers for Guaranteed Image Display (No Broken Links)
+const GolfPoloSVG = () => (
+  <svg viewBox="0 0 400 400" className="w-full h-full bg-neutral-900">
+    <rect width="400" height="400" fill="#0d0d0d" />
+    {/* Polo Base */}
+    <path d="M120 100 L160 70 L240 70 L280 100 L330 140 L290 180 L270 160 L270 340 L130 340 L130 160 L110 180 L70 140 Z" fill="#f8f9fa" />
+    {/* Collar & Buttons */}
+    <path d="M160 70 L200 130 L240 70 L220 70 L200 100 L180 70 Z" fill="#e9ecef" stroke="#ced4da" strokeWidth="2" />
+    <path d="M185 110 L215 110 L215 170 L185 170 Z" fill="#ffffff" stroke="#adb5bd" strokeWidth="1" />
+    <circle cx="200" cy="125" r="3" fill="#495057" />
+    <circle cx="200" cy="145" r="3" fill="#495057" />
+    {/* Chest Brand Emblem & Text */}
+    <path d="M235 180 L245 165 L255 180 Z M240 180 L240 195" stroke="#b59410" strokeWidth="2" fill="none" />
+    <text x="245" y="210" fill="#b59410" fontSize="11" fontFamily="serif" fontWeight="bold">REALCENOVA</text>
+  </svg>
+);
+
+const CowboyFrontBackSVG = () => (
+  <svg viewBox="0 0 800 400" className="w-full h-full bg-neutral-900">
+    <rect width="800" height="400" fill="#0a0a0a" />
+    {/* FRONT SIDE */}
+    <g transform="translate(20, 10)">
+      <text x="180" y="45" fill="#6c757d" fontSize="14" letterSpacing="4" textAnchor="middle">FRONT</text>
+      <path d="M70 90 L110 60 L250 60 L290 90 L340 130 L300 170 L280 150 L280 350 L80 350 L80 150 L60 170 L20 130 Z" fill="#ffffff" />
+      <text x="180" y="210" fill="#b59410" fontSize="18" fontFamily="serif" letterSpacing="3" textAnchor="middle" fontWeight="bold">REALCENOVA</text>
+    </g>
+    {/* BACK SIDE */}
+    <g transform="translate(420, 10)">
+      <text x="180" y="45" fill="#6c757d" fontSize="14" letterSpacing="4" textAnchor="middle">BACK</text>
+      <path d="M70 90 L110 60 L250 60 L290 90 L340 130 L300 170 L280 150 L280 350 L80 350 L80 150 L60 170 L20 130 Z" fill="#ffffff" />
+      {/* Cowboy Graphic Silhouette */}
+      <circle cx="180" cy="180" r="55" fill="#1a1a1a" />
+      <path d="M140 160 Q180 130 220 160 Q180 150 140 160 Z" fill="#b59410" />
+      <path d="M145 175 C145 160 215 160 215 175 L205 220 L155 220 Z" fill="#2b2b2b" />
+      <path d="M130 140 L210 220 M140 130 L220 210" stroke="#b59410" strokeWidth="4" strokeLinecap="round" />
+    </g>
+  </svg>
+);
+
+const RoundNeckSVG = () => (
+  <svg viewBox="0 0 400 400" className="w-full h-full bg-neutral-900">
+    <rect width="400" height="400" fill="#0d0d0d" />
+    <path d="M100 100 Q200 130 300 100 L340 140 L300 180 L280 160 L280 340 L120 340 L120 160 L100 180 L60 140 Z" fill="#f8f9fa" />
+    <path d="M160 100 Q200 135 240 100 Q200 115 160 100 Z" fill="#e9ecef" stroke="#ced4da" strokeWidth="1" />
+    <text x="200" y="210" fill="#b59410" fontSize="16" fontFamily="serif" letterSpacing="2" textAnchor="middle" fontWeight="bold">REALCENOVA</text>
+  </svg>
+);
 
 const INITIAL_PRODUCTS = [
   {
@@ -7,6 +55,7 @@ const INITIAL_PRODUCTS = [
     name: 'REALCENOVA Leather Slides (Gold Emblem)',
     price: 750.00,
     category: 'Footwear',
+    imageType: 'slides-gold',
     image: 'https://lh3.googleusercontent.com/d/11fJbgsvzLFUpPv977OHwq98gN_ns6b5z',
     hasOptions: true,
     sizes: ['5', '6', '7', '8', '9', '10', '11']
@@ -16,6 +65,7 @@ const INITIAL_PRODUCTS = [
     name: 'REALCENOVA Leather Slides (Stitched Patch)',
     price: 750.00,
     category: 'Footwear',
+    imageType: 'slides-patch',
     image: 'https://lh3.googleusercontent.com/d/1INdiML6Z7pslhVyYN6kBFMqH2Rs--54S',
     hasOptions: true,
     sizes: ['5', '6', '7', '8', '9', '10', '11']
@@ -25,7 +75,7 @@ const INITIAL_PRODUCTS = [
     name: 'REALCENOVA Golf T-Shirt (Buttoned Polo)',
     price: 559.99,
     category: 'Apparel',
-    image: 'https://lh3.googleusercontent.com/d/1hmgg66mxILONx9NFJkLP2AZirxfaO4NP',
+    imageType: 'golf-polo',
     hasOptions: true,
     colors: ['White', 'Black', 'Navy', 'Off-White'],
     sizes: ['S', 'M', 'L', 'XL', 'XXL']
@@ -35,7 +85,7 @@ const INITIAL_PRODUCTS = [
     name: 'REALCENOVA Round Neck T-Shirt',
     price: 449.99,
     category: 'Apparel',
-    image: 'https://lh3.googleusercontent.com/d/1hmgg66mxILONx9NFJkLP2AZirxfaO4NP',
+    imageType: 'round-neck',
     hasOptions: true,
     colors: ['White', 'Black', 'Navy', 'Grey'],
     sizes: ['S', 'M', 'L', 'XL', 'XXL']
@@ -45,7 +95,7 @@ const INITIAL_PRODUCTS = [
     name: 'REALCENOVA "Cowboy" Front & Back T-Shirt',
     price: 449.99,
     category: 'Apparel',
-    image: 'https://lh3.googleusercontent.com/d/1zbZzfsA1LQzxO005N93aYLjuLiSKnhHK',
+    imageType: 'cowboy-front-back',
     hasOptions: true,
     colors: ['White'],
     sizes: ['S', 'M', 'L', 'XL', 'XXL']
@@ -80,24 +130,15 @@ const INITIAL_PRODUCTS = [
   }
 ];
 
-// Helper Component for Image with Error Handling
-function ProductImage({ src, alt }) {
-  const [error, setError] = useState(false);
-
-  if (error || !src) {
-    return (
-      <div className="w-full h-full bg-neutral-900 flex flex-col items-center justify-center p-4 text-center">
-        <ImageOff size={32} className="text-neutral-700 mb-2" />
-        <span className="text-[10px] text-neutral-500 uppercase tracking-widest">{alt}</span>
-      </div>
-    );
-  }
+function ProductDisplayImage({ product }) {
+  if (product.imageType === 'golf-polo') return <GolfPoloSVG />;
+  if (product.imageType === 'cowboy-front-back') return <CowboyFrontBackSVG />;
+  if (product.imageType === 'round-neck') return <RoundNeckSVG />;
 
   return (
     <img
-      src={src}
-      alt={alt}
-      onError={() => setError(true)}
+      src={product.image}
+      alt={product.name}
       className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
     />
   );
@@ -111,7 +152,7 @@ export default function App() {
   const [storeUrl, setStoreUrl] = useState('https://realcenova-store.vercel.app');
   const [adminTab, setAdminTab] = useState('orders');
 
-  // Hard Reset LocalStorage Products on First Render to Fix Cache Issues
+  // Clear stale local storage once to force clean sync
   const [products, setProducts] = useState(() => {
     localStorage.removeItem('realcenova_products');
     return INITIAL_PRODUCTS;
@@ -121,7 +162,7 @@ export default function App() {
     localStorage.setItem('realcenova_products', JSON.stringify(products));
   }, [products]);
 
-  // Inline Price Editing State in Admin
+  // Inline Price Editing State
   const [editingProductId, setEditingProductId] = useState(null);
   const [editingPriceInput, setEditingPriceInput] = useState('');
 
@@ -339,7 +380,7 @@ export default function App() {
                 <div key={p.id} className="border border-neutral-900 bg-neutral-950/50 group overflow-hidden flex flex-col justify-between">
                   <div>
                     <div className="h-80 overflow-hidden bg-neutral-900">
-                      <ProductImage src={p.image} alt={p.name} />
+                      <ProductDisplayImage product={p} />
                     </div>
                     <div className="p-6">
                       <span className="text-xs text-neutral-500 tracking-widest uppercase">{p.category}</span>
@@ -641,7 +682,7 @@ export default function App() {
                     <div key={p.id} className="border border-neutral-900 p-4 flex justify-between items-center bg-neutral-950">
                       <div className="flex items-center gap-4">
                         <div className="w-14 h-14 bg-neutral-900 overflow-hidden">
-                          <ProductImage src={p.image} alt={p.name} />
+                          <ProductDisplayImage product={p} />
                         </div>
                         <div>
                           <h4 className="font-light tracking-wide">{p.name}</h4>
@@ -701,7 +742,7 @@ export default function App() {
                 cart.map(item => (
                   <div key={item.cartItemId} className="flex gap-4 border-b border-neutral-900 pb-4 items-center">
                     <div className="w-16 h-16 bg-neutral-900 overflow-hidden shrink-0">
-                      <ProductImage src={item.image} alt={item.name} />
+                      <ProductDisplayImage product={item} />
                     </div>
                     <div className="flex-1">
                       <h4 className="text-sm font-light">{item.name}</h4>
