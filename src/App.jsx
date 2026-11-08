@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShoppingBag, QrCode, Lock, CheckCircle, ShieldCheck, Sparkles, LogOut, Plus, Trash2 } from 'lucide-react';
+import { ShoppingBag, QrCode, Lock, LogOut, Plus, Trash2 } from 'lucide-react';
 
 export default function App() {
   const [view, setView] = useState('store');
@@ -9,12 +9,57 @@ export default function App() {
   const [storeUrl, setStoreUrl] = useState('https://realcenova-store.vercel.app');
   
   const [products, setProducts] = useState([
-    { id: 1, name: 'Cenova Royal Timepiece', price: 1499.00, category: 'Watches', image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&auto=format&fit=crop&q=80' },
-    { id: 2, name: 'Aura Velvet Leather Bag', price: 890.00, category: 'Accessories', image: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=600&auto=format&fit=crop&q=80' },
-    { id: 3, name: 'Onyx Signature Perfume', price: 340.00, category: 'Fragrances', image: 'https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=600&auto=format&fit=crop&q=80' }
+    {
+      id: 1,
+      name: 'REALCENOVA Leather Slides (Gold Emblem)',
+      price: 949.99,
+      category: 'Footwear',
+      image: 'https://lh3.googleusercontent.com/d/11fJbgsvzLFUpPv977OHwq98gN_ns6b5z'
+    },
+    {
+      id: 2,
+      name: 'REALCENOVA Leather Slides (Stitched Patch)',
+      price: 949.99,
+      category: 'Footwear',
+      image: 'https://lh3.googleusercontent.com/d/1INdiML6Z7pslhVyYN6kBFMqH2Rs--54S'
+    },
+    {
+      id: 3,
+      name: 'REALCENOVA Golf T-Shirt',
+      price: 1200.00,
+      category: 'Apparel',
+      image: 'https://lh3.googleusercontent.com/d/1hmgg66mxILONx9NFJkLP2AZirxfaO4NP'
+    },
+    {
+      id: 4,
+      name: 'REALCENOVA Round Neck T-Shirt',
+      price: 799.99,
+      category: 'Apparel',
+      image: 'https://lh3.googleusercontent.com/d/1hmgg66mxILONx9NFJkLP2AZirxfaO4NP'
+    },
+    {
+      id: 5,
+      name: 'REALCENOVA Gold Watch',
+      price: 1900.00,
+      category: 'Watches',
+      image: 'https://lh3.googleusercontent.com/d/1zbZzfsA1LQzxO005N93aYLjuLiSKnhHK'
+    },
+    {
+      id: 6,
+      name: 'REALCENOVA Classic Denim Jeans (Blue)',
+      price: 2799.99,
+      category: 'Apparel',
+      image: 'https://lh3.googleusercontent.com/d/1v1nmaNrfAp7ZDZZU2cG2T6kNyzuTyN7u'
+    },
+    {
+      id: 7,
+      name: 'REALCENOVA Classic Denim Jeans (Black)',
+      price: 2799.99,
+      category: 'Apparel',
+      image: 'https://lh3.googleusercontent.com/d/1pdUt7tFp7aGNI37vUG5gPXcEt9d7eZ9u'
+    }
   ]);
 
-  const [cart, setCart] = useState([]);
   const [newProduct, setNewProduct] = useState({ name: '', price: '', category: '', image: '' });
 
   const handleAdminLogin = (e) => {
@@ -63,13 +108,13 @@ export default function App() {
               {products.map(p => (
                 <div key={p.id} className="border border-neutral-900 bg-neutral-950/50 group overflow-hidden">
                   <div className="h-80 overflow-hidden bg-neutral-900">
-                    <img src={p.image || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600'} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                    <img src={p.image} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                   </div>
                   <div className="p-6">
                     <span className="text-xs text-neutral-500 tracking-widest uppercase">{p.category}</span>
                     <h3 className="text-lg font-light tracking-wide mt-1">{p.name}</h3>
-                    <p className="text-neutral-300 mt-2">${p.price.toFixed(2)}</p>
-                    <button onClick={() => alert(`${p.name} added to cart.`)} className="w-full mt-6 bg-white text-black py-3 text-xs tracking-[0.2em] uppercase hover:bg-neutral-200 transition">Add to Bag</button>
+                    <p className="text-neutral-300 mt-2">R {p.price.toFixed(2)}</p>
+                    <button onClick={() => alert(`${p.name} added to bag.`)} className="w-full mt-6 bg-white text-black py-3 text-xs tracking-[0.2em] uppercase hover:bg-neutral-200 transition">Add to Bag</button>
                   </div>
                 </div>
               ))}
@@ -104,7 +149,6 @@ export default function App() {
                 <input type="password" value={adminPass} onChange={e => setAdminPass(e.target.value)} className="w-full bg-black border border-neutral-800 p-3 text-sm focus:outline-none focus:border-white" placeholder="••••••••" required />
               </div>
               <button type="submit" className="w-full bg-white text-black py-3 text-xs tracking-[0.2em] uppercase hover:bg-neutral-200 transition mt-4">Login</button>
-              <p className="text-xs text-neutral-500 text-center mt-4">Default login: admin / realcenova123</p>
             </form>
           </div>
         )}
@@ -115,17 +159,21 @@ export default function App() {
             <form onSubmit={addProduct} className="border border-neutral-900 p-6 bg-neutral-950 mb-12 grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
               <div>
                 <label className="text-xs text-neutral-400 tracking-widest uppercase block mb-2">Product Name</label>
-                <input type="text" value={newProduct.name} onChange={e => setNewProduct({...newProduct, name: e.target.value})} className="w-full bg-black border border-neutral-800 p-3 text-sm" placeholder="Gold Watch" required />
+                <input type="text" value={newProduct.name} onChange={e => setNewProduct({...newProduct, name: e.target.value})} className="w-full bg-black border border-neutral-800 p-3 text-sm" placeholder="Product Name" required />
               </div>
               <div>
-                <label className="text-xs text-neutral-400 tracking-widest uppercase block mb-2">Price ($)</label>
-                <input type="number" value={newProduct.price} onChange={e => setNewProduct({...newProduct, price: e.target.value})} className="w-full bg-black border border-neutral-800 p-3 text-sm" placeholder="499.00" required />
+                <label className="text-xs text-neutral-400 tracking-widest uppercase block mb-2">Price (R)</label>
+                <input type="number" value={newProduct.price} onChange={e => setNewProduct({...newProduct, price: e.target.value})} className="w-full bg-black border border-neutral-800 p-3 text-sm" placeholder="0.00" required />
               </div>
               <div>
                 <label className="text-xs text-neutral-400 tracking-widest uppercase block mb-2">Category</label>
-                <input type="text" value={newProduct.category} onChange={e => setNewProduct({...newProduct, category: e.target.value})} className="w-full bg-black border border-neutral-800 p-3 text-sm" placeholder="Watches" />
+                <input type="text" value={newProduct.category} onChange={e => setNewProduct({...newProduct, category: e.target.value})} className="w-full bg-black border border-neutral-800 p-3 text-sm" placeholder="Category" />
               </div>
-              <button type="submit" className="bg-white text-black py-3 text-xs tracking-[0.2em] uppercase hover:bg-neutral-200 transition flex items-center justify-center gap-2"><Plus size={16}/> Add Product</button>
+              <div>
+                <label className="text-xs text-neutral-400 tracking-widest uppercase block mb-2">Image URL</label>
+                <input type="text" value={newProduct.image} onChange={e => setNewProduct({...newProduct, image: e.target.value})} className="w-full bg-black border border-neutral-800 p-3 text-sm" placeholder="https://..." />
+              </div>
+              <button type="submit" className="bg-white text-black py-3 text-xs tracking-[0.2em] uppercase hover:bg-neutral-200 transition flex items-center justify-center gap-2 col-span-full md:col-span-1"><Plus size={16}/> Add Product</button>
             </form>
 
             <div className="space-y-4">
@@ -135,7 +183,7 @@ export default function App() {
                     <img src={p.image} alt={p.name} className="w-12 h-12 object-cover" />
                     <div>
                       <h4 className="font-light tracking-wide">{p.name}</h4>
-                      <p className="text-xs text-neutral-500">${p.price.toFixed(2)}</p>
+                      <p className="text-xs text-neutral-500">R {p.price.toFixed(2)}</p>
                     </div>
                   </div>
                   <button onClick={() => deleteProduct(p.id)} className="text-red-400 hover:text-red-300 p-2"><Trash2 size={18}/></button>
