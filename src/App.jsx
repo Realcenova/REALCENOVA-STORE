@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingBag, QrCode, Lock, LogOut, Plus, Trash2, X, User, CheckCircle, Building, Truck, Bell, PackageCheck, Eye, Edit2, Check } from 'lucide-react';
+import { ShoppingBag, QrCode, Lock, LogOut, Plus, Trash2, X, User, CheckCircle, Building, Truck, Bell, PackageCheck, Eye, Edit2, Check, ImageOff } from 'lucide-react';
 
 const INITIAL_PRODUCTS = [
   {
@@ -7,7 +7,7 @@ const INITIAL_PRODUCTS = [
     name: 'REALCENOVA Leather Slides (Gold Emblem)',
     price: 750.00,
     category: 'Footwear',
-    image: '/slides-emblem.jpg',
+    image: 'https://lh3.googleusercontent.com/d/11fJbgsvzLFUpPv977OHwq98gN_ns6b5z',
     hasOptions: true,
     sizes: ['5', '6', '7', '8', '9', '10', '11']
   },
@@ -16,7 +16,7 @@ const INITIAL_PRODUCTS = [
     name: 'REALCENOVA Leather Slides (Stitched Patch)',
     price: 750.00,
     category: 'Footwear',
-    image: '/slides-patch.jpg',
+    image: 'https://lh3.googleusercontent.com/d/1INdiML6Z7pslhVyYN6kBFMqH2Rs--54S',
     hasOptions: true,
     sizes: ['5', '6', '7', '8', '9', '10', '11']
   },
@@ -25,7 +25,7 @@ const INITIAL_PRODUCTS = [
     name: 'REALCENOVA Golf T-Shirt (Buttoned Polo)',
     price: 559.99,
     category: 'Apparel',
-    image: '/golf-polo.jpg',
+    image: 'https://lh3.googleusercontent.com/d/1hmgg66mxILONx9NFJkLP2AZirxfaO4NP',
     hasOptions: true,
     colors: ['White', 'Black', 'Navy', 'Off-White'],
     sizes: ['S', 'M', 'L', 'XL', 'XXL']
@@ -35,7 +35,7 @@ const INITIAL_PRODUCTS = [
     name: 'REALCENOVA Round Neck T-Shirt',
     price: 449.99,
     category: 'Apparel',
-    image: '/round-neck.jpg',
+    image: 'https://lh3.googleusercontent.com/d/1hmgg66mxILONx9NFJkLP2AZirxfaO4NP',
     hasOptions: true,
     colors: ['White', 'Black', 'Navy', 'Grey'],
     sizes: ['S', 'M', 'L', 'XL', 'XXL']
@@ -45,7 +45,7 @@ const INITIAL_PRODUCTS = [
     name: 'REALCENOVA "Cowboy" Front & Back T-Shirt',
     price: 449.99,
     category: 'Apparel',
-    image: '/cowboy-front-back.jpg',
+    image: 'https://lh3.googleusercontent.com/d/1zbZzfsA1LQzxO005N93aYLjuLiSKnhHK',
     hasOptions: true,
     colors: ['White'],
     sizes: ['S', 'M', 'L', 'XL', 'XXL']
@@ -55,7 +55,7 @@ const INITIAL_PRODUCTS = [
     name: 'REALCENOVA Gold Watch',
     price: 1900.00,
     category: 'Watches',
-    image: '/gold-watch.jpg',
+    image: 'https://lh3.googleusercontent.com/d/1zbZzfsA1LQzxO005N93aYLjuLiSKnhHK',
     hasOptions: false
   },
   {
@@ -63,7 +63,7 @@ const INITIAL_PRODUCTS = [
     name: 'REALCENOVA Classic Denim Jeans (Blue)',
     price: 1300.00,
     category: 'Apparel',
-    image: '/jeans-blue.jpg',
+    image: 'https://lh3.googleusercontent.com/d/1v1nmaNrfAp7ZDZZU2cG2T6kNyzuTyN7u',
     hasOptions: true,
     colors: ['Blue'],
     sizes: ['28', '30', '32', '34', '36']
@@ -73,12 +73,35 @@ const INITIAL_PRODUCTS = [
     name: 'REALCENOVA Classic Denim Jeans (Black)',
     price: 1300.00,
     category: 'Apparel',
-    image: '/jeans-black.jpg',
+    image: 'https://lh3.googleusercontent.com/d/1pdUt7tFp7aGNI37vUG5gPXcEt9d7eZ9u',
     hasOptions: true,
     colors: ['Black'],
     sizes: ['28', '30', '32', '34', '36']
   }
 ];
+
+// Helper Component for Image with Error Handling
+function ProductImage({ src, alt }) {
+  const [error, setError] = useState(false);
+
+  if (error || !src) {
+    return (
+      <div className="w-full h-full bg-neutral-900 flex flex-col items-center justify-center p-4 text-center">
+        <ImageOff size={32} className="text-neutral-700 mb-2" />
+        <span className="text-[10px] text-neutral-500 uppercase tracking-widest">{alt}</span>
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={src}
+      alt={alt}
+      onError={() => setError(true)}
+      className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+    />
+  );
+}
 
 export default function App() {
   const [view, setView] = useState('store');
@@ -88,8 +111,9 @@ export default function App() {
   const [storeUrl, setStoreUrl] = useState('https://realcenova-store.vercel.app');
   const [adminTab, setAdminTab] = useState('orders');
 
-  // Auto-sync products with updated images (Overriding outdated local storage cache)
+  // Hard Reset LocalStorage Products on First Render to Fix Cache Issues
   const [products, setProducts] = useState(() => {
+    localStorage.removeItem('realcenova_products');
     return INITIAL_PRODUCTS;
   });
 
@@ -315,7 +339,7 @@ export default function App() {
                 <div key={p.id} className="border border-neutral-900 bg-neutral-950/50 group overflow-hidden flex flex-col justify-between">
                   <div>
                     <div className="h-80 overflow-hidden bg-neutral-900">
-                      <img src={p.image} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                      <ProductImage src={p.image} alt={p.name} />
                     </div>
                     <div className="p-6">
                       <span className="text-xs text-neutral-500 tracking-widest uppercase">{p.category}</span>
@@ -616,7 +640,9 @@ export default function App() {
                   {products.map(p => (
                     <div key={p.id} className="border border-neutral-900 p-4 flex justify-between items-center bg-neutral-950">
                       <div className="flex items-center gap-4">
-                        <img src={p.image} alt={p.name} className="w-14 h-14 object-cover bg-neutral-900" />
+                        <div className="w-14 h-14 bg-neutral-900 overflow-hidden">
+                          <ProductImage src={p.image} alt={p.name} />
+                        </div>
                         <div>
                           <h4 className="font-light tracking-wide">{p.name}</h4>
                           
@@ -674,7 +700,9 @@ export default function App() {
               ) : (
                 cart.map(item => (
                   <div key={item.cartItemId} className="flex gap-4 border-b border-neutral-900 pb-4 items-center">
-                    <img src={item.image} alt={item.name} className="w-16 h-16 object-cover bg-neutral-900" />
+                    <div className="w-16 h-16 bg-neutral-900 overflow-hidden shrink-0">
+                      <ProductImage src={item.image} alt={item.name} />
+                    </div>
                     <div className="flex-1">
                       <h4 className="text-sm font-light">{item.name}</h4>
                       {(item.selectedColor || item.selectedSize) && (
