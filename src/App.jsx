@@ -1,5 +1,74 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingBag, QrCode, Lock, LogOut, Plus, Trash2, X, User, CheckCircle, Building, Truck, Bell, PackageCheck, Eye } from 'lucide-react';
+import { ShoppingBag, QrCode, Lock, LogOut, Plus, Trash2, X, User, CheckCircle, Building, Truck, Bell, PackageCheck, Eye, Edit2, Check } from 'lucide-react';
+
+const INITIAL_PRODUCTS = [
+  {
+    id: 1,
+    name: 'REALCENOVA Leather Slides (Gold Emblem)',
+    price: 949.99,
+    category: 'Footwear',
+    image: 'https://lh3.googleusercontent.com/d/11fJbgsvzLFUpPv977OHwq98gN_ns6b5z',
+    hasOptions: true,
+    sizes: ['5', '6', '7', '8', '9', '10', '11']
+  },
+  {
+    id: 2,
+    name: 'REALCENOVA Leather Slides (Stitched Patch)',
+    price: 949.99,
+    category: 'Footwear',
+    image: 'https://lh3.googleusercontent.com/d/1INdiML6Z7pslhVyYN6kBFMqH2Rs--54S',
+    hasOptions: true,
+    sizes: ['5', '6', '7', '8', '9', '10', '11']
+  },
+  {
+    id: 3,
+    name: 'REALCENOVA Golf T-Shirt',
+    price: 1200.00,
+    category: 'Apparel',
+    image: 'https://lh3.googleusercontent.com/d/1hmgg66mxILONx9NFJkLP2AZirxfaO4NP',
+    hasOptions: true,
+    colors: ['White', 'Black', 'Navy', 'Off-White'],
+    sizes: ['S', 'M', 'L', 'XL', 'XXL']
+  },
+  {
+    id: 4,
+    name: 'REALCENOVA Round Neck T-Shirt',
+    price: 799.99,
+    category: 'Apparel',
+    image: 'https://lh3.googleusercontent.com/d/1hmgg66mxILONx9NFJkLP2AZirxfaO4NP',
+    hasOptions: true,
+    colors: ['White', 'Black', 'Navy', 'Grey'],
+    sizes: ['S', 'M', 'L', 'XL', 'XXL']
+  },
+  {
+    id: 5,
+    name: 'REALCENOVA Gold Watch',
+    price: 1900.00,
+    category: 'Watches',
+    image: 'https://lh3.googleusercontent.com/d/1zbZzfsA1LQzxO005N93aYLjuLiSKnhHK',
+    hasOptions: false
+  },
+  {
+    id: 6,
+    name: 'REALCENOVA Classic Denim Jeans (Blue)',
+    price: 2799.99,
+    category: 'Apparel',
+    image: 'https://lh3.googleusercontent.com/d/1v1nmaNrfAp7ZDZZU2cG2T6kNyzuTyN7u',
+    hasOptions: true,
+    colors: ['Blue'],
+    sizes: ['28', '30', '32', '34', '36']
+  },
+  {
+    id: 7,
+    name: 'REALCENOVA Classic Denim Jeans (Black)',
+    price: 2799.99,
+    category: 'Apparel',
+    image: 'https://lh3.googleusercontent.com/d/1pdUt7tFp7aGNI37vUG5gPXcEt9d7eZ9u',
+    hasOptions: true,
+    colors: ['Black'],
+    sizes: ['28', '30', '32', '34', '36']
+  }
+];
 
 export default function App() {
   const [view, setView] = useState('store');
@@ -7,7 +76,21 @@ export default function App() {
   const [adminUser, setAdminUser] = useState('');
   const [adminPass, setAdminPass] = useState('');
   const [storeUrl, setStoreUrl] = useState('https://realcenova-store.vercel.app');
-  const [adminTab, setAdminTab] = useState('orders'); // 'orders' | 'inventory'
+  const [adminTab, setAdminTab] = useState('orders');
+
+  // Persistent Products with LocalStorage
+  const [products, setProducts] = useState(() => {
+    const saved = localStorage.getItem('realcenova_products');
+    return saved ? JSON.parse(saved) : INITIAL_PRODUCTS;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('realcenova_products', JSON.stringify(products));
+  }, [products]);
+
+  // Inline Price Editing State
+  const [editingProductId, setEditingProductId] = useState(null);
+  const [editingPriceInput, setEditingPriceInput] = useState('');
 
   // Persistent Orders & Notification State
   const [orders, setOrders] = useState(() => {
@@ -48,75 +131,6 @@ export default function App() {
     province: 'KwaZulu-Natal',
     postalCode: ''
   });
-
-  const [products, setProducts] = useState([
-    {
-      id: 1,
-      name: 'REALCENOVA Leather Slides (Gold Emblem)',
-      price: 949.99,
-      category: 'Footwear',
-      image: 'https://lh3.googleusercontent.com/d/11fJbgsvzLFUpPv977OHwq98gN_ns6b5z',
-      hasOptions: true,
-      sizes: ['5', '6', '7', '8', '9', '10', '11']
-    },
-    {
-      id: 2,
-      name: 'REALCENOVA Leather Slides (Stitched Patch)',
-      price: 949.99,
-      category: 'Footwear',
-      image: 'https://lh3.googleusercontent.com/d/1INdiML6Z7pslhVyYN6kBFMqH2Rs--54S',
-      hasOptions: true,
-      sizes: ['5', '6', '7', '8', '9', '10', '11']
-    },
-    {
-      id: 3,
-      name: 'REALCENOVA Golf T-Shirt',
-      price: 1200.00,
-      category: 'Apparel',
-      image: 'https://lh3.googleusercontent.com/d/1hmgg66mxILONx9NFJkLP2AZirxfaO4NP',
-      hasOptions: true,
-      colors: ['White', 'Black', 'Navy', 'Off-White'],
-      sizes: ['S', 'M', 'L', 'XL', 'XXL']
-    },
-    {
-      id: 4,
-      name: 'REALCENOVA Round Neck T-Shirt',
-      price: 799.99,
-      category: 'Apparel',
-      image: 'https://lh3.googleusercontent.com/d/1hmgg66mxILONx9NFJkLP2AZirxfaO4NP',
-      hasOptions: true,
-      colors: ['White', 'Black', 'Navy', 'Grey'],
-      sizes: ['S', 'M', 'L', 'XL', 'XXL']
-    },
-    {
-      id: 5,
-      name: 'REALCENOVA Gold Watch',
-      price: 1900.00,
-      category: 'Watches',
-      image: 'https://lh3.googleusercontent.com/d/1zbZzfsA1LQzxO005N93aYLjuLiSKnhHK',
-      hasOptions: false
-    },
-    {
-      id: 6,
-      name: 'REALCENOVA Classic Denim Jeans (Blue)',
-      price: 2799.99,
-      category: 'Apparel',
-      image: 'https://lh3.googleusercontent.com/d/1v1nmaNrfAp7ZDZZU2cG2T6kNyzuTyN7u',
-      hasOptions: true,
-      colors: ['Blue'],
-      sizes: ['28', '30', '32', '34', '36']
-    },
-    {
-      id: 7,
-      name: 'REALCENOVA Classic Denim Jeans (Black)',
-      price: 2799.99,
-      category: 'Apparel',
-      image: 'https://lh3.googleusercontent.com/d/1pdUt7tFp7aGNI37vUG5gPXcEt9d7eZ9u',
-      hasOptions: true,
-      colors: ['Black'],
-      sizes: ['28', '30', '32', '34', '36']
-    }
-  ]);
 
   const [newProduct, setNewProduct] = useState({ name: '', price: '', category: '', image: '' });
 
@@ -176,6 +190,21 @@ export default function App() {
 
   const deleteProduct = (id) => {
     setProducts(products.filter(p => p.id !== id));
+  };
+
+  const startEditingPrice = (product) => {
+    setEditingProductId(product.id);
+    setEditingPriceInput(product.price.toString());
+  };
+
+  const savePrice = (id) => {
+    const numericPrice = parseFloat(editingPriceInput);
+    if (isNaN(numericPrice) || numericPrice <= 0) {
+      alert('Please enter a valid price amount.');
+      return;
+    }
+    setProducts(products.map(p => p.id === id ? { ...p, price: numericPrice } : p));
+    setEditingProductId(null);
   };
 
   const markOrderAsRead = (id) => {
@@ -468,7 +497,6 @@ export default function App() {
                       key={order.orderId} 
                       className={`border p-6 relative transition ${order.read ? 'border-neutral-900 bg-neutral-950/40' : 'border-red-900/60 bg-red-950/10'}`}
                     >
-                      {/* Red Unread Notification Indicator */}
                       {!order.read && (
                         <div className="absolute top-4 right-4 flex items-center gap-2 bg-red-950 border border-red-800 text-red-300 text-[10px] px-2.5 py-1 rounded-full uppercase tracking-widest font-semibold">
                           <span className="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
@@ -530,228 +558,4 @@ export default function App() {
                         {!order.read && (
                           <button 
                             onClick={() => markOrderAsRead(order.orderId)} 
-                            className="bg-neutral-800 text-neutral-200 px-4 py-2 text-xs tracking-wider uppercase hover:bg-neutral-700 transition flex items-center gap-1.5"
-                          >
-                            <Eye size={14} /> Mark as Inspected
-                          </button>
-                        )}
-                        <button 
-                          onClick={() => deleteOrder(order.orderId)} 
-                          className="text-red-400 hover:text-red-300 p-2 text-xs flex items-center gap-1"
-                        >
-                          <Trash2 size={14}/> Clear Order
-                        </button>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            )}
-
-            {/* TAB 2: Inventory Management Slot */}
-            {adminTab === 'inventory' && (
-              <div>
-                <form onSubmit={addProduct} className="border border-neutral-900 p-6 bg-neutral-950 mb-12 grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-                  <div>
-                    <label className="text-xs text-neutral-400 tracking-widest uppercase block mb-2">Product Name</label>
-                    <input type="text" value={newProduct.name} onChange={e => setNewProduct({...newProduct, name: e.target.value})} className="w-full bg-black border border-neutral-800 p-3 text-sm" placeholder="Product Name" required />
-                  </div>
-                  <div>
-                    <label className="text-xs text-neutral-400 tracking-widest uppercase block mb-2">Price (R)</label>
-                    <input type="number" value={newProduct.price} onChange={e => setNewProduct({...newProduct, price: e.target.value})} className="w-full bg-black border border-neutral-800 p-3 text-sm" placeholder="0.00" required />
-                  </div>
-                  <div>
-                    <label className="text-xs text-neutral-400 tracking-widest uppercase block mb-2">Category</label>
-                    <input type="text" value={newProduct.category} onChange={e => setNewProduct({...newProduct, category: e.target.value})} className="w-full bg-black border border-neutral-800 p-3 text-sm" placeholder="Category" />
-                  </div>
-                  <div>
-                    <label className="text-xs text-neutral-400 tracking-widest uppercase block mb-2">Image URL</label>
-                    <input type="text" value={newProduct.image} onChange={e => setNewProduct({...newProduct, image: e.target.value})} className="w-full bg-black border border-neutral-800 p-3 text-sm" placeholder="https://..." />
-                  </div>
-                  <button type="submit" className="bg-white text-black py-3 text-xs tracking-[0.2em] uppercase hover:bg-neutral-200 transition flex items-center justify-center gap-2 col-span-full md:col-span-1"><Plus size={16}/> Add Product</button>
-                </form>
-
-                <div className="space-y-4">
-                  {products.map(p => (
-                    <div key={p.id} className="border border-neutral-900 p-4 flex justify-between items-center bg-neutral-950">
-                      <div className="flex items-center gap-4">
-                        <img src={p.image} alt={p.name} className="w-12 h-12 object-cover" />
-                        <div>
-                          <h4 className="font-light tracking-wide">{p.name}</h4>
-                          <p className="text-xs text-neutral-500">R {p.price.toFixed(2)}</p>
-                        </div>
-                      </div>
-                      <button onClick={() => deleteProduct(p.id)} className="text-red-400 hover:text-red-300 p-2"><Trash2 size={18}/></button>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-      </main>
-
-      {/* Slide-out Cart Drawer */}
-      {isCartOpen && (
-        <div className="fixed inset-0 z-50 flex justify-end bg-black/70 backdrop-blur-sm">
-          <div className="w-full max-w-md bg-neutral-950 h-full border-l border-neutral-900 flex flex-col p-6">
-            <div className="flex justify-between items-center border-b border-neutral-900 pb-4">
-              <h3 className="text-lg font-light tracking-widest uppercase">Shopping Bag ({cartCount})</h3>
-              <button onClick={() => setIsCartOpen(false)} className="text-neutral-400 hover:text-white"><X size={20}/></button>
-            </div>
-
-            <div className="flex-1 overflow-y-auto py-6 space-y-4">
-              {cart.length === 0 ? (
-                <p className="text-neutral-500 text-center py-12 tracking-wide text-sm">Your shopping bag is empty.</p>
-              ) : (
-                cart.map(item => (
-                  <div key={item.cartItemId} className="flex gap-4 border-b border-neutral-900 pb-4 items-center">
-                    <img src={item.image} alt={item.name} className="w-16 h-16 object-cover bg-neutral-900" />
-                    <div className="flex-1">
-                      <h4 className="text-sm font-light">{item.name}</h4>
-                      {(item.selectedColor || item.selectedSize) && (
-                        <p className="text-[11px] text-neutral-400 mt-0.5">
-                          {item.selectedColor && `Color: ${item.selectedColor}`} {item.selectedSize && `| Size: ${item.selectedSize}`}
-                        </p>
-                      )}
-                      <p className="text-xs text-neutral-400 mt-1">R {item.price.toFixed(2)} x {item.qty}</p>
-                    </div>
-                    <button onClick={() => removeFromCart(item.cartItemId)} className="text-neutral-500 hover:text-red-400"><Trash2 size={16}/></button>
-                  </div>
-                ))
-              )}
-            </div>
-
-            {cart.length > 0 && (
-              <div className="border-t border-neutral-900 pt-6">
-                <div className="flex justify-between text-sm tracking-wider mb-6">
-                  <span>Subtotal</span>
-                  <span>R {cartTotal.toFixed(2)}</span>
-                </div>
-                <button 
-                  onClick={() => { setIsCartOpen(false); setIsCheckoutOpen(true); setCheckoutStep(1); }} 
-                  className="w-full bg-white text-black py-4 text-xs tracking-[0.2em] uppercase hover:bg-neutral-200 transition"
-                >
-                  Proceed to Delivery & Checkout
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Checkout, Delivery & EFT Payment Modal */}
-      {isCheckoutOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
-          <div className="max-w-2xl w-full bg-neutral-950 border border-neutral-900 p-8 my-8 relative">
-            <button onClick={() => { setIsCheckoutOpen(false); setOrderComplete(false); setCheckoutStep(1); }} className="absolute top-6 right-6 text-neutral-400 hover:text-white"><X size={20}/></button>
-
-            {orderComplete ? (
-              <div className="text-center py-8">
-                <CheckCircle size={48} className="mx-auto text-emerald-400 mb-4" />
-                <h3 className="text-2xl font-light tracking-widest mb-2">ORDER PLACED SUCCESSFULLY</h3>
-                <p className="text-neutral-400 text-sm mb-4">Order Reference Number: <strong className="text-white">{recentOrder?.orderId}</strong></p>
-                <div className="bg-neutral-900/60 p-4 border border-neutral-800 text-xs text-neutral-300 text-left mb-6 space-y-1 font-mono">
-                  <p><strong>Recipient:</strong> {recentOrder?.customer} ({recentOrder?.phone})</p>
-                  <p><strong>Address:</strong> {recentOrder?.address}</p>
-                  <p><strong>Payment Ref:</strong> {recentOrder?.ref}</p>
-                  <p><strong>Estimated Delivery:</strong> 5–7 Working Days</p>
-                </div>
-                <button onClick={() => { setIsCheckoutOpen(false); setOrderComplete(false); setCheckoutStep(1); setView('store'); }} className="bg-white text-black px-8 py-3 text-xs tracking-[0.2em] uppercase hover:bg-neutral-200 transition">Return to Store</button>
-              </div>
-            ) : checkoutStep === 1 ? (
-              <div>
-                <h3 className="text-xl font-light tracking-widest uppercase mb-4">Step 1: Delivery Details</h3>
-                
-                <div className="flex items-center gap-3 bg-neutral-900/80 border border-neutral-800 p-3 mb-6 text-xs text-neutral-300">
-                  <Truck size={18} className="text-white shrink-0" />
-                  <span><strong>Standard Delivery:</strong> Delivered within <strong>5 to 7 Working Days</strong> via door-to-door courier.</span>
-                </div>
-
-                <form onSubmit={handleProceedToPayment} className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-xs text-neutral-400 tracking-widest uppercase block mb-2">Recipient Full Name</label>
-                      <input type="text" value={shippingAddress.fullName} onChange={e => setShippingAddress({...shippingAddress, fullName: e.target.value})} className="w-full bg-black border border-neutral-800 p-3 text-sm focus:outline-none focus:border-white" required />
-                    </div>
-                    <div>
-                      <label className="text-xs text-neutral-400 tracking-widest uppercase block mb-2">Phone Number</label>
-                      <input type="tel" value={shippingAddress.phone} onChange={e => setShippingAddress({...shippingAddress, phone: e.target.value})} className="w-full bg-black border border-neutral-800 p-3 text-sm focus:outline-none focus:border-white" placeholder="+27 ..." required />
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="text-xs text-neutral-400 tracking-widest uppercase block mb-2">Street Address</label>
-                    <input type="text" value={shippingAddress.street} onChange={e => setShippingAddress({...shippingAddress, street: e.target.value})} className="w-full bg-black border border-neutral-800 p-3 text-sm focus:outline-none focus:border-white" placeholder="123 Luxury Way" required />
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <label className="text-xs text-neutral-400 tracking-widest uppercase block mb-2">Suburb</label>
-                      <input type="text" value={shippingAddress.suburb} onChange={e => setShippingAddress({...shippingAddress, suburb: e.target.value})} className="w-full bg-black border border-neutral-800 p-3 text-sm focus:outline-none focus:border-white" placeholder="Morningside" required />
-                    </div>
-                    <div>
-                      <label className="text-xs text-neutral-400 tracking-widest uppercase block mb-2">City</label>
-                      <input type="text" value={shippingAddress.city} onChange={e => setShippingAddress({...shippingAddress, city: e.target.value})} className="w-full bg-black border border-neutral-800 p-3 text-sm focus:outline-none focus:border-white" placeholder="Durban" required />
-                    </div>
-                    <div>
-                      <label className="text-xs text-neutral-400 tracking-widest uppercase block mb-2">Postal Code</label>
-                      <input type="text" value={shippingAddress.postalCode} onChange={e => setShippingAddress({...shippingAddress, postalCode: e.target.value})} className="w-full bg-black border border-neutral-800 p-3 text-sm focus:outline-none focus:border-white" placeholder="4001" required />
-                    </div>
-                  </div>
-
-                  <button type="submit" className="w-full bg-white text-black py-4 text-xs tracking-[0.2em] uppercase hover:bg-neutral-200 transition">
-                    Continue to Payment
-                  </button>
-                </form>
-              </div>
-            ) : (
-              <div>
-                <h3 className="text-xl font-light tracking-widest uppercase mb-4">Step 2: Payment (Direct EFT Transfer)</h3>
-                
-                <div className="border border-neutral-900 bg-neutral-900/40 p-6 mb-6">
-                  <div className="flex items-center gap-2 mb-4 text-neutral-300">
-                    <Building size={18} />
-                    <span className="text-sm uppercase tracking-wider font-medium">REALCENOVA Banking Details</span>
-                  </div>
-                  <div className="space-y-2 text-xs text-neutral-400 font-mono">
-                    <p><strong className="text-neutral-200">Bank Name:</strong> Capitec Bank</p>
-                    <p><strong className="text-neutral-200">Account Name:</strong> REALCENOVA STORE</p>
-                    <p><strong className="text-neutral-200">Account Number:</strong> 2419862631</p>
-                    <p><strong className="text-neutral-200">Reference:</strong> {shippingAddress.phone || 'Your Phone Number'}</p>
-                    <p className="text-white text-sm font-sans mt-3 border-t border-neutral-800 pt-2 font-light">
-                      Total Payable: <strong className="text-emerald-400">R {cartTotal.toFixed(2)}</strong>
-                    </p>
-                  </div>
-                </div>
-
-                <form onSubmit={handleFinalizeOrder} className="space-y-6">
-                  <div>
-                    <label className="text-xs text-neutral-400 tracking-widest uppercase block mb-2">Payment Reference / Transaction ID</label>
-                    <input 
-                      type="text" 
-                      value={paymentRef} 
-                      onChange={e => setPaymentRef(e.target.value)} 
-                      className="w-full bg-black border border-neutral-800 p-3 text-sm focus:outline-none focus:border-white" 
-                      placeholder="Enter EFT Ref or Payment Confirmation No." 
-                      required 
-                    />
-                  </div>
-
-                  <div className="flex gap-4">
-                    <button type="button" onClick={() => setCheckoutStep(1)} className="w-1/3 border border-neutral-800 text-neutral-400 py-4 text-xs tracking-[0.2em] uppercase hover:text-white transition">
-                      Back
-                    </button>
-                    <button type="submit" className="w-2/3 bg-white text-black py-4 text-xs tracking-[0.2em] uppercase hover:bg-neutral-200 transition">
-                      Confirm & Complete Order
-                    </button>
-                  </div>
-                </form>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
+                            className="bg-neutral-800 text-neutral-200 px-4 py-2 text-xs tracking-wider uppercase hover:bg-neutral-7
