@@ -538,10 +538,9 @@ export default function App() {
                     <span className="text-sm uppercase tracking-wider font-medium">REALCENOVA Banking Details</span>
                   </div>
                   <div className="space-y-2 text-xs text-neutral-400 font-mono">
-                    <p><strong className="text-neutral-200">Bank Name:</strong> Capitec Bank / FNB</p>
+                    <p><strong className="text-neutral-200">Bank Name:</strong> Capitec Bank</p>
                     <p><strong className="text-neutral-200">Account Name:</strong> REALCENOVA STORE</p>
-                    <p><strong className="text-neutral-200">Account Number:</strong> 1234 5678 901</p>
-                    <p><strong className="text-neutral-200">Branch Code:</strong> 470010</p>
+                    <p><strong className="text-neutral-200">Account Number:</strong> 2419862631</p>
                     <p><strong className="text-neutral-200">Reference:</strong> {shippingAddress.phone || 'Your Phone Number'}</p>
                     <p className="text-white text-sm font-sans mt-3 border-t border-neutral-800 pt-2 font-light">
                       Total Payable: <strong className="text-emerald-400">R {cartTotal.toFixed(2)}</strong>
