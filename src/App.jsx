@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { ShoppingBag, QrCode, Lock, LogOut, Plus, Trash2, X, User, CheckCircle, Building, Truck } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ShoppingBag, QrCode, Lock, LogOut, Plus, Trash2, X, User, CheckCircle, Building, Truck, Bell, PackageCheck, Eye } from 'lucide-react';
 
 export default function App() {
   const [view, setView] = useState('store');
@@ -7,7 +7,20 @@ export default function App() {
   const [adminUser, setAdminUser] = useState('');
   const [adminPass, setAdminPass] = useState('');
   const [storeUrl, setStoreUrl] = useState('https://realcenova-store.vercel.app');
-  
+  const [adminTab, setAdminTab] = useState('orders'); // 'orders' | 'inventory'
+
+  // Persistent Orders & Notification State
+  const [orders, setOrders] = useState(() => {
+    const saved = localStorage.getItem('realcenova_orders');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('realcenova_orders', JSON.stringify(orders));
+  }, [orders]);
+
+  const unreadCount = orders.filter(o => !o.read).length;
+
   // Customer Auth State
   const [customer, setCustomer] = useState(null);
   const [authMode, setAuthMode] = useState('login');
@@ -25,7 +38,7 @@ export default function App() {
   const [orderComplete, setOrderComplete] = useState(false);
   const [paymentRef, setPaymentRef] = useState('');
   const [recentOrder, setRecentOrder] = useState(null);
-  
+
   const [shippingAddress, setShippingAddress] = useState({
     fullName: '',
     phone: '',
@@ -144,7 +157,7 @@ export default function App() {
     setView('store');
   };
 
-  // Admin Login
+  // Admin Login & Management
   const handleAdminLogin = (e) => {
     e.preventDefault();
     if (adminUser === 'admin' && adminPass === 'realcenova123') {
@@ -165,6 +178,18 @@ export default function App() {
     setProducts(products.filter(p => p.id !== id));
   };
 
+  const markOrderAsRead = (id) => {
+    setOrders(orders.map(o => o.orderId === id ? { ...o, read: true } : o));
+  };
+
+  const deleteOrder = (id) => {
+    setOrders(orders.filter(o => o.orderId !== id));
+  };
+
+  const markAllAsRead = () => {
+    setOrders(orders.map(o => ({ ...o, read: true })));
+  };
+
   const handleProceedToPayment = (e) => {
     e.preventDefault();
     setCheckoutStep(2);
@@ -177,11 +202,14 @@ export default function App() {
       customer: customer ? customer.name : shippingAddress.fullName,
       phone: shippingAddress.phone,
       address: `${shippingAddress.street}, ${shippingAddress.suburb}, ${shippingAddress.city}, ${shippingAddress.postalCode}`,
-      items: cart,
+      items: [...cart],
       total: cartTotal,
       ref: paymentRef,
-      date: new Date().toLocaleDateString()
+      date: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      read: false
     };
+
+    setOrders(prev => [orderData, ...prev]);
     setRecentOrder(orderData);
     setOrderComplete(true);
     setCart([]);
@@ -215,9 +243,22 @@ export default function App() {
           <button onClick={() => setView('qr')} className="flex items-center gap-1.5 hover:text-neutral-400 transition"><QrCode size={16}/> Store QR</button>
           
           {isAdmin ? (
-            <button onClick={() => setIsAdmin(false)} className="flex items-center gap-1 text-red-400"><LogOut size={16}/> Exit Admin</button>
+            <button onClick={() => setView('admin')} className="relative flex items-center gap-2 text-amber-400">
+              <Lock size={16}/> Admin
+              {unreadCount > 0 && (
+                <span className="relative flex h-2.5 w-2.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500"></span>
+                </span>
+              )}
+            </button>
           ) : (
-            <button onClick={() => setView('admin')} className="flex items-center gap-1.5 hover:text-neutral-400 transition"><Lock size={16}/> Admin</button>
+            <button onClick={() => setView('admin')} className="relative flex items-center gap-1.5 hover:text-neutral-400 transition">
+              <Lock size={16}/> Admin
+              {unreadCount > 0 && (
+                <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+              )}
+            </button>
           )}
         </nav>
       </header>
@@ -243,7 +284,7 @@ export default function App() {
                       <h3 className="text-lg font-light tracking-wide mt-1">{p.name}</h3>
                       <p className="text-neutral-300 mt-2 font-medium">R {p.price.toFixed(2)}</p>
 
-                      {/* Customization Options (Color / Size) */}
+                      {/* Customization Options */}
                       {p.hasOptions && (
                         <div className="mt-4 space-y-3 pt-4 border-t border-neutral-900">
                           {p.colors && (
@@ -371,44 +412,181 @@ export default function App() {
           </div>
         )}
 
-        {/* Admin Inventory Management */}
+        {/* Admin Dashboard: Orders Notification Center & Inventory */}
         {view === 'admin' && isAdmin && (
           <div>
-            <h2 className="text-2xl font-light tracking-widest mb-8">INVENTORY MANAGEMENT</h2>
-            <form onSubmit={addProduct} className="border border-neutral-900 p-6 bg-neutral-950 mb-12 grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-              <div>
-                <label className="text-xs text-neutral-400 tracking-widest uppercase block mb-2">Product Name</label>
-                <input type="text" value={newProduct.name} onChange={e => setNewProduct({...newProduct, name: e.target.value})} className="w-full bg-black border border-neutral-800 p-3 text-sm" placeholder="Product Name" required />
-              </div>
-              <div>
-                <label className="text-xs text-neutral-400 tracking-widest uppercase block mb-2">Price (R)</label>
-                <input type="number" value={newProduct.price} onChange={e => setNewProduct({...newProduct, price: e.target.value})} className="w-full bg-black border border-neutral-800 p-3 text-sm" placeholder="0.00" required />
-              </div>
-              <div>
-                <label className="text-xs text-neutral-400 tracking-widest uppercase block mb-2">Category</label>
-                <input type="text" value={newProduct.category} onChange={e => setNewProduct({...newProduct, category: e.target.value})} className="w-full bg-black border border-neutral-800 p-3 text-sm" placeholder="Category" />
-              </div>
-              <div>
-                <label className="text-xs text-neutral-400 tracking-widest uppercase block mb-2">Image URL</label>
-                <input type="text" value={newProduct.image} onChange={e => setNewProduct({...newProduct, image: e.target.value})} className="w-full bg-black border border-neutral-800 p-3 text-sm" placeholder="https://..." />
-              </div>
-              <button type="submit" className="bg-white text-black py-3 text-xs tracking-[0.2em] uppercase hover:bg-neutral-200 transition flex items-center justify-center gap-2 col-span-full md:col-span-1"><Plus size={16}/> Add Product</button>
-            </form>
+            <div className="flex justify-between items-center mb-8 border-b border-neutral-900 pb-4">
+              <div className="flex gap-4">
+                <button 
+                  onClick={() => setAdminTab('orders')} 
+                  className={`flex items-center gap-2 pb-2 text-sm tracking-widest uppercase border-b-2 transition ${adminTab === 'orders' ? 'border-white text-white font-medium' : 'border-transparent text-neutral-500'}`}
+                >
+                  <Bell size={18} />
+                  Customer Orders
+                  {unreadCount > 0 && (
+                    <span className="bg-red-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold animate-pulse">
+                      {unreadCount} NEW
+                    </span>
+                  )}
+                </button>
 
-            <div className="space-y-4">
-              {products.map(p => (
-                <div key={p.id} className="border border-neutral-900 p-4 flex justify-between items-center bg-neutral-950">
-                  <div className="flex items-center gap-4">
-                    <img src={p.image} alt={p.name} className="w-12 h-12 object-cover" />
-                    <div>
-                      <h4 className="font-light tracking-wide">{p.name}</h4>
-                      <p className="text-xs text-neutral-500">R {p.price.toFixed(2)}</p>
-                    </div>
-                  </div>
-                  <button onClick={() => deleteProduct(p.id)} className="text-red-400 hover:text-red-300 p-2"><Trash2 size={18}/></button>
-                </div>
-              ))}
+                <button 
+                  onClick={() => setAdminTab('inventory')} 
+                  className={`flex items-center gap-2 pb-2 text-sm tracking-widest uppercase border-b-2 transition ${adminTab === 'inventory' ? 'border-white text-white font-medium' : 'border-transparent text-neutral-500'}`}
+                >
+                  <PackageCheck size={18} />
+                  Inventory Management
+                </button>
+              </div>
+
+              <button onClick={() => setIsAdmin(false)} className="text-xs text-neutral-500 hover:text-red-400 uppercase tracking-widest">
+                Log Out Admin
+              </button>
             </div>
+
+            {/* TAB 1: Customer Orders Slot */}
+            {adminTab === 'orders' && (
+              <div className="space-y-6">
+                <div className="flex justify-between items-center">
+                  <p className="text-sm text-neutral-400">
+                    Total Received Orders: <strong className="text-white">{orders.length}</strong> | Unread Notifications: <strong className="text-red-400">{unreadCount}</strong>
+                  </p>
+                  {unreadCount > 0 && (
+                    <button onClick={markAllAsRead} className="text-xs text-neutral-400 hover:text-white underline">
+                      Mark All as Read
+                    </button>
+                  )}
+                </div>
+
+                {orders.length === 0 ? (
+                  <div className="border border-neutral-900 bg-neutral-950 p-12 text-center text-neutral-500 tracking-wide text-sm">
+                    No orders have been placed yet.
+                  </div>
+                ) : (
+                  orders.map(order => (
+                    <div 
+                      key={order.orderId} 
+                      className={`border p-6 relative transition ${order.read ? 'border-neutral-900 bg-neutral-950/40' : 'border-red-900/60 bg-red-950/10'}`}
+                    >
+                      {/* Red Unread Notification Indicator */}
+                      {!order.read && (
+                        <div className="absolute top-4 right-4 flex items-center gap-2 bg-red-950 border border-red-800 text-red-300 text-[10px] px-2.5 py-1 rounded-full uppercase tracking-widest font-semibold">
+                          <span className="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+                          NEW UNREAD ORDER
+                        </div>
+                      )}
+
+                      <div className="flex justify-between items-start mb-4 border-b border-neutral-900 pb-3">
+                        <div>
+                          <span className="text-xs text-neutral-500 font-mono">{order.date}</span>
+                          <h3 className="text-lg font-medium text-white tracking-wider mt-0.5">
+                            Order ID: <span className="font-mono text-emerald-400">{order.orderId}</span>
+                          </h3>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-xs text-neutral-400 block">Total Amount</span>
+                          <span className="text-lg font-medium text-emerald-400">R {order.total.toFixed(2)}</span>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs text-neutral-300 font-mono mb-4">
+                        <div className="bg-neutral-900/60 p-3 border border-neutral-900">
+                          <strong className="text-neutral-400 block uppercase font-sans tracking-wider mb-1">Customer Details</strong>
+                          <p><strong>Name:</strong> {order.customer}</p>
+                          <p><strong>Phone:</strong> {order.phone}</p>
+                        </div>
+
+                        <div className="bg-neutral-900/60 p-3 border border-neutral-900">
+                          <strong className="text-neutral-400 block uppercase font-sans tracking-wider mb-1">Shipping Address</strong>
+                          <p>{order.address}</p>
+                        </div>
+
+                        <div className="bg-neutral-900/60 p-3 border border-neutral-900">
+                          <strong className="text-neutral-400 block uppercase font-sans tracking-wider mb-1">Payment Reference</strong>
+                          <p className="text-emerald-400 font-semibold">{order.ref}</p>
+                        </div>
+                      </div>
+
+                      <div className="border-t border-neutral-900 pt-3 mb-4">
+                        <strong className="text-xs text-neutral-400 uppercase tracking-wider block mb-2 font-sans">Purchased Items</strong>
+                        <div className="space-y-2">
+                          {order.items.map((item, idx) => (
+                            <div key={idx} className="flex justify-between items-center text-xs text-neutral-300 bg-black p-2 border border-neutral-900">
+                              <div>
+                                <span className="font-medium text-white">{item.name}</span>
+                                {(item.selectedColor || item.selectedSize) && (
+                                  <span className="text-neutral-500 ml-2">
+                                    ({item.selectedColor ? `Color: ${item.selectedColor}` : ''} {item.selectedSize ? `| Size: ${item.selectedSize}` : ''})
+                                  </span>
+                                )}
+                              </div>
+                              <span>Qty: {item.qty} &times; R {item.price.toFixed(2)}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="flex justify-end gap-3 pt-2">
+                        {!order.read && (
+                          <button 
+                            onClick={() => markOrderAsRead(order.orderId)} 
+                            className="bg-neutral-800 text-neutral-200 px-4 py-2 text-xs tracking-wider uppercase hover:bg-neutral-700 transition flex items-center gap-1.5"
+                          >
+                            <Eye size={14} /> Mark as Inspected
+                          </button>
+                        )}
+                        <button 
+                          onClick={() => deleteOrder(order.orderId)} 
+                          className="text-red-400 hover:text-red-300 p-2 text-xs flex items-center gap-1"
+                        >
+                          <Trash2 size={14}/> Clear Order
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+
+            {/* TAB 2: Inventory Management Slot */}
+            {adminTab === 'inventory' && (
+              <div>
+                <form onSubmit={addProduct} className="border border-neutral-900 p-6 bg-neutral-950 mb-12 grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                  <div>
+                    <label className="text-xs text-neutral-400 tracking-widest uppercase block mb-2">Product Name</label>
+                    <input type="text" value={newProduct.name} onChange={e => setNewProduct({...newProduct, name: e.target.value})} className="w-full bg-black border border-neutral-800 p-3 text-sm" placeholder="Product Name" required />
+                  </div>
+                  <div>
+                    <label className="text-xs text-neutral-400 tracking-widest uppercase block mb-2">Price (R)</label>
+                    <input type="number" value={newProduct.price} onChange={e => setNewProduct({...newProduct, price: e.target.value})} className="w-full bg-black border border-neutral-800 p-3 text-sm" placeholder="0.00" required />
+                  </div>
+                  <div>
+                    <label className="text-xs text-neutral-400 tracking-widest uppercase block mb-2">Category</label>
+                    <input type="text" value={newProduct.category} onChange={e => setNewProduct({...newProduct, category: e.target.value})} className="w-full bg-black border border-neutral-800 p-3 text-sm" placeholder="Category" />
+                  </div>
+                  <div>
+                    <label className="text-xs text-neutral-400 tracking-widest uppercase block mb-2">Image URL</label>
+                    <input type="text" value={newProduct.image} onChange={e => setNewProduct({...newProduct, image: e.target.value})} className="w-full bg-black border border-neutral-800 p-3 text-sm" placeholder="https://..." />
+                  </div>
+                  <button type="submit" className="bg-white text-black py-3 text-xs tracking-[0.2em] uppercase hover:bg-neutral-200 transition flex items-center justify-center gap-2 col-span-full md:col-span-1"><Plus size={16}/> Add Product</button>
+                </form>
+
+                <div className="space-y-4">
+                  {products.map(p => (
+                    <div key={p.id} className="border border-neutral-900 p-4 flex justify-between items-center bg-neutral-950">
+                      <div className="flex items-center gap-4">
+                        <img src={p.image} alt={p.name} className="w-12 h-12 object-cover" />
+                        <div>
+                          <h4 className="font-light tracking-wide">{p.name}</h4>
+                          <p className="text-xs text-neutral-500">R {p.price.toFixed(2)}</p>
+                        </div>
+                      </div>
+                      <button onClick={() => deleteProduct(p.id)} className="text-red-400 hover:text-red-300 p-2"><Trash2 size={18}/></button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </main>
@@ -485,7 +663,6 @@ export default function App() {
               <div>
                 <h3 className="text-xl font-light tracking-widest uppercase mb-4">Step 1: Delivery Details</h3>
                 
-                {/* Delivery Timeframe Notice */}
                 <div className="flex items-center gap-3 bg-neutral-900/80 border border-neutral-800 p-3 mb-6 text-xs text-neutral-300">
                   <Truck size={18} className="text-white shrink-0" />
                   <span><strong>Standard Delivery:</strong> Delivered within <strong>5 to 7 Working Days</strong> via door-to-door courier.</span>
