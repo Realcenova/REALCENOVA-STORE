@@ -22,10 +22,10 @@ const INITIAL_PRODUCTS = [
   },
   {
     id: 3,
-    name: 'REALCENOVA Golf T-Shirt',
+    name: 'REALCENOVA Golf T-Shirt (Buttoned Polo)',
     price: 559.99,
     category: 'Apparel',
-    image: 'https://lh3.googleusercontent.com/d/1hmgg66mxILONx9NFJkLP2AZirxfaO4NP',
+    image: 'https://lh3.googleusercontent.com/d/1hmgg66mxILONx9NFJkLP2AZirxfaO4NP', // Golf Polo image
     hasOptions: true,
     colors: ['White', 'Black', 'Navy', 'Off-White'],
     sizes: ['S', 'M', 'L', 'XL', 'XXL']
@@ -35,7 +35,7 @@ const INITIAL_PRODUCTS = [
     name: 'REALCENOVA Round Neck T-Shirt',
     price: 449.99,
     category: 'Apparel',
-    image: 'https://lh3.googleusercontent.com/d/1hmgg66mxILONx9NFJkLP2AZirxfaO4NP',
+    image: 'https://lh3.googleusercontent.com/d/1v1nmaNrfAp7ZDZZU2cG2T6kNyzuTyN7u', // Distinct Apparel placeholder
     hasOptions: true,
     colors: ['White', 'Black', 'Navy', 'Grey'],
     sizes: ['S', 'M', 'L', 'XL', 'XXL']
@@ -45,7 +45,7 @@ const INITIAL_PRODUCTS = [
     name: 'REALCENOVA "Cowboy" Front & Back T-Shirt',
     price: 449.99,
     category: 'Apparel',
-    image: 'https://lh3.googleusercontent.com/d/1hmgg66mxILONx9NFJkLP2AZirxfaO4NP',
+    image: 'https://lh3.googleusercontent.com/d/1zbZzfsA1LQzxO005N93aYLjuLiSKnhHK', // Front & Back Showcase image
     hasOptions: true,
     colors: ['White'],
     sizes: ['S', 'M', 'L', 'XL', 'XXL']
