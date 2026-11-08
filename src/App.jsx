@@ -7,7 +7,7 @@ const INITIAL_PRODUCTS = [
     name: 'REALCENOVA Leather Slides (Gold Emblem)',
     price: 750.00,
     category: 'Footwear',
-    image: 'https://lh3.googleusercontent.com/d/11fJbgsvzLFUpPv977OHwq98gN_ns6b5z',
+    image: '/slides-emblem.jpg',
     hasOptions: true,
     sizes: ['5', '6', '7', '8', '9', '10', '11']
   },
@@ -16,7 +16,7 @@ const INITIAL_PRODUCTS = [
     name: 'REALCENOVA Leather Slides (Stitched Patch)',
     price: 750.00,
     category: 'Footwear',
-    image: 'https://lh3.googleusercontent.com/d/1INdiML6Z7pslhVyYN6kBFMqH2Rs--54S',
+    image: '/slides-patch.jpg',
     hasOptions: true,
     sizes: ['5', '6', '7', '8', '9', '10', '11']
   },
@@ -25,7 +25,7 @@ const INITIAL_PRODUCTS = [
     name: 'REALCENOVA Golf T-Shirt (Buttoned Polo)',
     price: 559.99,
     category: 'Apparel',
-    image: 'https://lh3.googleusercontent.com/d/1hmgg66mxILONx9NFJkLP2AZirxfaO4NP', // Golf Polo image
+    image: '/golf-polo.jpg',
     hasOptions: true,
     colors: ['White', 'Black', 'Navy', 'Off-White'],
     sizes: ['S', 'M', 'L', 'XL', 'XXL']
@@ -35,7 +35,7 @@ const INITIAL_PRODUCTS = [
     name: 'REALCENOVA Round Neck T-Shirt',
     price: 449.99,
     category: 'Apparel',
-    image: 'https://lh3.googleusercontent.com/d/1v1nmaNrfAp7ZDZZU2cG2T6kNyzuTyN7u', // Distinct Apparel placeholder
+    image: '/round-neck.jpg',
     hasOptions: true,
     colors: ['White', 'Black', 'Navy', 'Grey'],
     sizes: ['S', 'M', 'L', 'XL', 'XXL']
@@ -45,7 +45,7 @@ const INITIAL_PRODUCTS = [
     name: 'REALCENOVA "Cowboy" Front & Back T-Shirt',
     price: 449.99,
     category: 'Apparel',
-    image: 'https://lh3.googleusercontent.com/d/1zbZzfsA1LQzxO005N93aYLjuLiSKnhHK', // Front & Back Showcase image
+    image: '/cowboy-front-back.jpg',
     hasOptions: true,
     colors: ['White'],
     sizes: ['S', 'M', 'L', 'XL', 'XXL']
@@ -55,7 +55,7 @@ const INITIAL_PRODUCTS = [
     name: 'REALCENOVA Gold Watch',
     price: 1900.00,
     category: 'Watches',
-    image: 'https://lh3.googleusercontent.com/d/1zbZzfsA1LQzxO005N93aYLjuLiSKnhHK',
+    image: '/gold-watch.jpg',
     hasOptions: false
   },
   {
@@ -63,7 +63,7 @@ const INITIAL_PRODUCTS = [
     name: 'REALCENOVA Classic Denim Jeans (Blue)',
     price: 1300.00,
     category: 'Apparel',
-    image: 'https://lh3.googleusercontent.com/d/1v1nmaNrfAp7ZDZZU2cG2T6kNyzuTyN7u',
+    image: '/jeans-blue.jpg',
     hasOptions: true,
     colors: ['Blue'],
     sizes: ['28', '30', '32', '34', '36']
@@ -73,7 +73,7 @@ const INITIAL_PRODUCTS = [
     name: 'REALCENOVA Classic Denim Jeans (Black)',
     price: 1300.00,
     category: 'Apparel',
-    image: 'https://lh3.googleusercontent.com/d/1pdUt7tFp7aGNI37vUG5gPXcEt9d7eZ9u',
+    image: '/jeans-black.jpg',
     hasOptions: true,
     colors: ['Black'],
     sizes: ['28', '30', '32', '34', '36']
@@ -88,10 +88,9 @@ export default function App() {
   const [storeUrl, setStoreUrl] = useState('https://realcenova-store.vercel.app');
   const [adminTab, setAdminTab] = useState('orders');
 
-  // Persistent Products with LocalStorage
+  // Auto-sync products with updated images (Overriding outdated local storage cache)
   const [products, setProducts] = useState(() => {
-    const saved = localStorage.getItem('realcenova_products');
-    return saved ? JSON.parse(saved) : INITIAL_PRODUCTS;
+    return INITIAL_PRODUCTS;
   });
 
   useEffect(() => {
