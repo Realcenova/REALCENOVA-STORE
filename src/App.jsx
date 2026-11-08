@@ -5,7 +5,7 @@ const INITIAL_PRODUCTS = [
   {
     id: 1,
     name: 'REALCENOVA Leather Slides (Gold Emblem)',
-    price: 949.99,
+    price: 750.00,
     category: 'Footwear',
     image: 'https://lh3.googleusercontent.com/d/11fJbgsvzLFUpPv977OHwq98gN_ns6b5z',
     hasOptions: true,
@@ -14,7 +14,7 @@ const INITIAL_PRODUCTS = [
   {
     id: 2,
     name: 'REALCENOVA Leather Slides (Stitched Patch)',
-    price: 949.99,
+    price: 750.00,
     category: 'Footwear',
     image: 'https://lh3.googleusercontent.com/d/1INdiML6Z7pslhVyYN6kBFMqH2Rs--54S',
     hasOptions: true,
@@ -23,7 +23,7 @@ const INITIAL_PRODUCTS = [
   {
     id: 3,
     name: 'REALCENOVA Golf T-Shirt',
-    price: 1200.00,
+    price: 559.99,
     category: 'Apparel',
     image: 'https://lh3.googleusercontent.com/d/1hmgg66mxILONx9NFJkLP2AZirxfaO4NP',
     hasOptions: true,
@@ -33,11 +33,21 @@ const INITIAL_PRODUCTS = [
   {
     id: 4,
     name: 'REALCENOVA Round Neck T-Shirt',
-    price: 799.99,
+    price: 449.99,
     category: 'Apparel',
     image: 'https://lh3.googleusercontent.com/d/1hmgg66mxILONx9NFJkLP2AZirxfaO4NP',
     hasOptions: true,
     colors: ['White', 'Black', 'Navy', 'Grey'],
+    sizes: ['S', 'M', 'L', 'XL', 'XXL']
+  },
+  {
+    id: 8,
+    name: 'REALCENOVA "Cowboy" Front & Back T-Shirt',
+    price: 449.99,
+    category: 'Apparel',
+    image: 'https://images.squarespace-cdn.com/content/v1/5e173e86725350619e075c34/f7d37e6f-fb9e-4903-b6d8-77c8e709087c/Realcenova-Cowboy-TShirt.png',
+    hasOptions: true,
+    colors: ['White'],
     sizes: ['S', 'M', 'L', 'XL', 'XXL']
   },
   {
@@ -51,7 +61,7 @@ const INITIAL_PRODUCTS = [
   {
     id: 6,
     name: 'REALCENOVA Classic Denim Jeans (Blue)',
-    price: 2799.99,
+    price: 1300.00,
     category: 'Apparel',
     image: 'https://lh3.googleusercontent.com/d/1v1nmaNrfAp7ZDZZU2cG2T6kNyzuTyN7u',
     hasOptions: true,
@@ -61,7 +71,7 @@ const INITIAL_PRODUCTS = [
   {
     id: 7,
     name: 'REALCENOVA Classic Denim Jeans (Black)',
-    price: 2799.99,
+    price: 1300.00,
     category: 'Apparel',
     image: 'https://lh3.googleusercontent.com/d/1pdUt7tFp7aGNI37vUG5gPXcEt9d7eZ9u',
     hasOptions: true,
@@ -88,7 +98,7 @@ export default function App() {
     localStorage.setItem('realcenova_products', JSON.stringify(products));
   }, [products]);
 
-  // Inline Price Editing State
+  // Inline Price Editing State in Admin
   const [editingProductId, setEditingProductId] = useState(null);
   const [editingPriceInput, setEditingPriceInput] = useState('');
 
@@ -441,7 +451,7 @@ export default function App() {
           </div>
         )}
 
-        {/* Admin Dashboard: Orders Notification Center & Inventory */}
+        {/* Admin Dashboard: Orders Notification Center & Inventory Price Editor */}
         {view === 'admin' && isAdmin && (
           <div>
             <div className="flex justify-between items-center mb-8 border-b border-neutral-900 pb-4">
@@ -464,7 +474,7 @@ export default function App() {
                   className={`flex items-center gap-2 pb-2 text-sm tracking-widest uppercase border-b-2 transition ${adminTab === 'inventory' ? 'border-white text-white font-medium' : 'border-transparent text-neutral-500'}`}
                 >
                   <PackageCheck size={18} />
-                  Inventory Management
+                  Inventory & Live Price Editor
                 </button>
               </div>
 
@@ -558,4 +568,259 @@ export default function App() {
                         {!order.read && (
                           <button 
                             onClick={() => markOrderAsRead(order.orderId)} 
-                            className="bg-neutral-800 text-neutral-200 px-4 py-2 text-xs tracking-wider uppercase hover:bg-neutral-7
+                            className="bg-neutral-800 text-neutral-200 px-4 py-2 text-xs tracking-wider uppercase hover:bg-neutral-700 transition flex items-center gap-1.5"
+                          >
+                            <Eye size={14} /> Mark as Inspected
+                          </button>
+                        )}
+                        <button 
+                          onClick={() => deleteOrder(order.orderId)} 
+                          className="text-red-400 hover:text-red-300 p-2 text-xs flex items-center gap-1"
+                        >
+                          <Trash2 size={14}/> Clear Order
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+
+            {/* TAB 2: Inventory & Live Price Editor Slot */}
+            {adminTab === 'inventory' && (
+              <div>
+                <div className="mb-6 bg-neutral-900/50 border border-neutral-800 p-4 text-xs text-neutral-300">
+                  <p><strong>Admin Price Control:</strong> Click <strong>"Edit Price"</strong> on any product below to instantly update its store price right from your browser without modifying any code files!</p>
+                </div>
+
+                <form onSubmit={addProduct} className="border border-neutral-900 p-6 bg-neutral-950 mb-12 grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                  <div>
+                    <label className="text-xs text-neutral-400 tracking-widest uppercase block mb-2">Product Name</label>
+                    <input type="text" value={newProduct.name} onChange={e => setNewProduct({...newProduct, name: e.target.value})} className="w-full bg-black border border-neutral-800 p-3 text-sm focus:outline-none focus:border-white" placeholder="Product Name" required />
+                  </div>
+                  <div>
+                    <label className="text-xs text-neutral-400 tracking-widest uppercase block mb-2">Price (R)</label>
+                    <input type="number" value={newProduct.price} onChange={e => setNewProduct({...newProduct, price: e.target.value})} className="w-full bg-black border border-neutral-800 p-3 text-sm focus:outline-none focus:border-white" placeholder="0.00" required />
+                  </div>
+                  <div>
+                    <label className="text-xs text-neutral-400 tracking-widest uppercase block mb-2">Category</label>
+                    <input type="text" value={newProduct.category} onChange={e => setNewProduct({...newProduct, category: e.target.value})} className="w-full bg-black border border-neutral-800 p-3 text-sm focus:outline-none focus:border-white" placeholder="Category" />
+                  </div>
+                  <div>
+                    <label className="text-xs text-neutral-400 tracking-widest uppercase block mb-2">Image URL</label>
+                    <input type="text" value={newProduct.image} onChange={e => setNewProduct({...newProduct, image: e.target.value})} className="w-full bg-black border border-neutral-800 p-3 text-sm focus:outline-none focus:border-white" placeholder="https://..." />
+                  </div>
+                  <button type="submit" className="bg-white text-black py-3 text-xs tracking-[0.2em] uppercase hover:bg-neutral-200 transition flex items-center justify-center gap-2 col-span-full md:col-span-1"><Plus size={16}/> Add Product</button>
+                </form>
+
+                <div className="space-y-4">
+                  {products.map(p => (
+                    <div key={p.id} className="border border-neutral-900 p-4 flex justify-between items-center bg-neutral-950">
+                      <div className="flex items-center gap-4">
+                        <img src={p.image} alt={p.name} className="w-14 h-14 object-cover bg-neutral-900" />
+                        <div>
+                          <h4 className="font-light tracking-wide">{p.name}</h4>
+                          
+                          {/* Live Price Editor */}
+                          {editingProductId === p.id ? (
+                            <div className="flex items-center gap-2 mt-1">
+                              <span className="text-xs text-neutral-400">R</span>
+                              <input 
+                                type="number" 
+                                value={editingPriceInput} 
+                                onChange={e => setEditingPriceInput(e.target.value)} 
+                                className="w-24 bg-black border border-white px-2 py-1 text-xs text-emerald-400 font-mono focus:outline-none"
+                                autoFocus
+                              />
+                              <button onClick={() => savePrice(p.id)} className="bg-emerald-600 hover:bg-emerald-500 text-white p-1 rounded transition">
+                                <Check size={14} />
+                              </button>
+                              <button onClick={() => setEditingProductId(null)} className="text-neutral-500 hover:text-white p-1">
+                                <X size={14} />
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-3 mt-1">
+                              <p className="text-xs text-emerald-400 font-medium font-mono">R {p.price.toFixed(2)}</p>
+                              <button onClick={() => startEditingPrice(p)} className="text-[11px] text-neutral-400 hover:text-white underline flex items-center gap-1">
+                                <Edit2 size={12} /> Edit Price
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      
+                      <button onClick={() => deleteProduct(p.id)} className="text-neutral-500 hover:text-red-400 p-2 transition"><Trash2 size={18}/></button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </main>
+
+      {/* Slide-out Cart Drawer */}
+      {isCartOpen && (
+        <div className="fixed inset-0 z-50 flex justify-end bg-black/70 backdrop-blur-sm">
+          <div className="w-full max-w-md bg-neutral-950 h-full border-l border-neutral-900 flex flex-col p-6">
+            <div className="flex justify-between items-center border-b border-neutral-900 pb-4">
+              <h3 className="text-lg font-light tracking-widest uppercase">Shopping Bag ({cartCount})</h3>
+              <button onClick={() => setIsCartOpen(false)} className="text-neutral-400 hover:text-white"><X size={20}/></button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto py-6 space-y-4">
+              {cart.length === 0 ? (
+                <p className="text-neutral-500 text-center py-12 tracking-wide text-sm">Your shopping bag is empty.</p>
+              ) : (
+                cart.map(item => (
+                  <div key={item.cartItemId} className="flex gap-4 border-b border-neutral-900 pb-4 items-center">
+                    <img src={item.image} alt={item.name} className="w-16 h-16 object-cover bg-neutral-900" />
+                    <div className="flex-1">
+                      <h4 className="text-sm font-light">{item.name}</h4>
+                      {(item.selectedColor || item.selectedSize) && (
+                        <p className="text-[11px] text-neutral-400 mt-0.5">
+                          {item.selectedColor && `Color: ${item.selectedColor}`} {item.selectedSize && `| Size: ${item.selectedSize}`}
+                        </p>
+                      )}
+                      <p className="text-xs text-neutral-400 mt-1">R {item.price.toFixed(2)} x {item.qty}</p>
+                    </div>
+                    <button onClick={() => removeFromCart(item.cartItemId)} className="text-neutral-500 hover:text-red-400"><Trash2 size={16}/></button>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {cart.length > 0 && (
+              <div className="border-t border-neutral-900 pt-6">
+                <div className="flex justify-between text-sm tracking-wider mb-6">
+                  <span>Subtotal</span>
+                  <span>R {cartTotal.toFixed(2)}</span>
+                </div>
+                <button 
+                  onClick={() => { setIsCartOpen(false); setIsCheckoutOpen(true); setCheckoutStep(1); }} 
+                  className="w-full bg-white text-black py-4 text-xs tracking-[0.2em] uppercase hover:bg-neutral-200 transition"
+                >
+                  Proceed to Delivery & Checkout
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Checkout, Delivery & EFT Payment Modal */}
+      {isCheckoutOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
+          <div className="max-w-2xl w-full bg-neutral-950 border border-neutral-900 p-8 my-8 relative">
+            <button onClick={() => { setIsCheckoutOpen(false); setOrderComplete(false); setCheckoutStep(1); }} className="absolute top-6 right-6 text-neutral-400 hover:text-white"><X size={20}/></button>
+
+            {orderComplete ? (
+              <div className="text-center py-8">
+                <CheckCircle size={48} className="mx-auto text-emerald-400 mb-4" />
+                <h3 className="text-2xl font-light tracking-widest mb-2">ORDER PLACED SUCCESSFULLY</h3>
+                <p className="text-neutral-400 text-sm mb-4">Order Reference Number: <strong className="text-white">{recentOrder?.orderId}</strong></p>
+                <div className="bg-neutral-900/60 p-4 border border-neutral-800 text-xs text-neutral-300 text-left mb-6 space-y-1 font-mono">
+                  <p><strong>Recipient:</strong> {recentOrder?.customer} ({recentOrder?.phone})</p>
+                  <p><strong>Address:</strong> {recentOrder?.address}</p>
+                  <p><strong>Payment Ref:</strong> {recentOrder?.ref}</p>
+                  <p><strong>Estimated Delivery:</strong> 5–7 Working Days</p>
+                </div>
+                <button onClick={() => { setIsCheckoutOpen(false); setOrderComplete(false); setCheckoutStep(1); setView('store'); }} className="bg-white text-black px-8 py-3 text-xs tracking-[0.2em] uppercase hover:bg-neutral-200 transition">Return to Store</button>
+              </div>
+            ) : checkoutStep === 1 ? (
+              <div>
+                <h3 className="text-xl font-light tracking-widest uppercase mb-4">Step 1: Delivery Details</h3>
+                
+                <div className="flex items-center gap-3 bg-neutral-900/80 border border-neutral-800 p-3 mb-6 text-xs text-neutral-300">
+                  <Truck size={18} className="text-white shrink-0" />
+                  <span><strong>Standard Delivery:</strong> Delivered within <strong>5 to 7 Working Days</strong> via door-to-door courier.</span>
+                </div>
+
+                <form onSubmit={handleProceedToPayment} className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs text-neutral-400 tracking-widest uppercase block mb-2">Recipient Full Name</label>
+                      <input type="text" value={shippingAddress.fullName} onChange={e => setShippingAddress({...shippingAddress, fullName: e.target.value})} className="w-full bg-black border border-neutral-800 p-3 text-sm focus:outline-none focus:border-white" required />
+                    </div>
+                    <div>
+                      <label className="text-xs text-neutral-400 tracking-widest uppercase block mb-2">Phone Number</label>
+                      <input type="tel" value={shippingAddress.phone} onChange={e => setShippingAddress({...shippingAddress, phone: e.target.value})} className="w-full bg-black border border-neutral-800 p-3 text-sm focus:outline-none focus:border-white" placeholder="+27 ..." required />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-xs text-neutral-400 tracking-widest uppercase block mb-2">Street Address</label>
+                    <input type="text" value={shippingAddress.street} onChange={e => setShippingAddress({...shippingAddress, street: e.target.value})} className="w-full bg-black border border-neutral-800 p-3 text-sm focus:outline-none focus:border-white" placeholder="123 Luxury Way" required />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                      <label className="text-xs text-neutral-400 tracking-widest uppercase block mb-2">Suburb</label>
+                      <input type="text" value={shippingAddress.suburb} onChange={e => setShippingAddress({...shippingAddress, suburb: e.target.value})} className="w-full bg-black border border-neutral-800 p-3 text-sm focus:outline-none focus:border-white" placeholder="Morningside" required />
+                    </div>
+                    <div>
+                      <label className="text-xs text-neutral-400 tracking-widest uppercase block mb-2">City</label>
+                      <input type="text" value={shippingAddress.city} onChange={e => setShippingAddress({...shippingAddress, city: e.target.value})} className="w-full bg-black border border-neutral-800 p-3 text-sm focus:outline-none focus:border-white" placeholder="Durban" required />
+                    </div>
+                    <div>
+                      <label className="text-xs text-neutral-400 tracking-widest uppercase block mb-2">Postal Code</label>
+                      <input type="text" value={shippingAddress.postalCode} onChange={e => setShippingAddress({...shippingAddress, postalCode: e.target.value})} className="w-full bg-black border border-neutral-800 p-3 text-sm focus:outline-none focus:border-white" placeholder="4001" required />
+                    </div>
+                  </div>
+
+                  <button type="submit" className="w-full bg-white text-black py-4 text-xs tracking-[0.2em] uppercase hover:bg-neutral-200 transition">
+                    Continue to Payment
+                  </button>
+                </form>
+              </div>
+            ) : (
+              <div>
+                <h3 className="text-xl font-light tracking-widest uppercase mb-4">Step 2: Payment (Direct EFT Transfer)</h3>
+                
+                <div className="border border-neutral-900 bg-neutral-900/40 p-6 mb-6">
+                  <div className="flex items-center gap-2 mb-4 text-neutral-300">
+                    <Building size={18} />
+                    <span className="text-sm uppercase tracking-wider font-medium">REALCENOVA Banking Details</span>
+                  </div>
+                  <div className="space-y-2 text-xs text-neutral-400 font-mono">
+                    <p><strong className="text-neutral-200">Bank Name:</strong> Capitec Bank</p>
+                    <p><strong className="text-neutral-200">Account Name:</strong> REALCENOVA STORE</p>
+                    <p><strong className="text-neutral-200">Account Number:</strong> 2419862631</p>
+                    <p><strong className="text-neutral-200">Reference:</strong> {shippingAddress.phone || 'Your Phone Number'}</p>
+                    <p className="text-white text-sm font-sans mt-3 border-t border-neutral-800 pt-2 font-light">
+                      Total Payable: <strong className="text-emerald-400">R {cartTotal.toFixed(2)}</strong>
+                    </p>
+                  </div>
+                </div>
+
+                <form onSubmit={handleFinalizeOrder} className="space-y-6">
+                  <div>
+                    <label className="text-xs text-neutral-400 tracking-widest uppercase block mb-2">Payment Reference / Transaction ID</label>
+                    <input 
+                      type="text" 
+                      value={paymentRef} 
+                      onChange={e => setPaymentRef(e.target.value)} 
+                      className="w-full bg-black border border-neutral-800 p-3 text-sm focus:outline-none focus:border-white" 
+                      placeholder="Enter EFT Ref or Payment Confirmation No." 
+                      required 
+                    />
+                  </div>
+
+                  <div className="flex gap-4">
+                    <button type="button" onClick={() => setCheckoutStep(1)} className="w-1/3 border border-neutral-800 text-neutral-400 py-4 text-xs tracking-[0.2em] uppercase hover:text-white transition">
+                      Back
+                    </button>
+                    <button type="submit" className="w-2/3 bg-white text-black py-4 text-xs tracking-[0.2em] uppercase hover:bg-neutral-200 transition">
+                      Confirm & Complete Order
+                    </button>
+                  </div>
+                </form>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
