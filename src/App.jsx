@@ -88,11 +88,8 @@ export default function App() {
   const [storeUrl, setStoreUrl] = useState('https://realcenova-store.vercel.app');
   const [adminTab, setAdminTab] = useState('orders');
 
-  // Forced cache flush: resets localStorage so all 8 items reload clean
-  const [products, setProducts] = useState(() => {
-    localStorage.clear();
-    return INITIAL_PRODUCTS;
-  });
+  // Load products from INITIAL_PRODUCTS directly to override old browser cache
+  const [products, setProducts] = useState(INITIAL_PRODUCTS);
 
   useEffect(() => {
     localStorage.setItem('realcenova_products', JSON.stringify(products));
