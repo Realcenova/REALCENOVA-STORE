@@ -1,62 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { ShoppingBag, QrCode, Lock, LogOut, Plus, Trash2, X, User, CheckCircle, Building, Truck, Bell, PackageCheck, Eye, Edit2, Check } from 'lucide-react';
 
-// Custom Self-Contained SVG Renderers for Guaranteed Image Display (No Broken Links)
-const GolfPoloSVG = () => (
-  <svg viewBox="0 0 400 400" className="w-full h-full bg-neutral-900">
-    <rect width="400" height="400" fill="#0d0d0d" />
-    {/* Polo Base */}
-    <path d="M120 100 L160 70 L240 70 L280 100 L330 140 L290 180 L270 160 L270 340 L130 340 L130 160 L110 180 L70 140 Z" fill="#f8f9fa" />
-    {/* Collar & Buttons */}
-    <path d="M160 70 L200 130 L240 70 L220 70 L200 100 L180 70 Z" fill="#e9ecef" stroke="#ced4da" strokeWidth="2" />
-    <path d="M185 110 L215 110 L215 170 L185 170 Z" fill="#ffffff" stroke="#adb5bd" strokeWidth="1" />
-    <circle cx="200" cy="125" r="3" fill="#495057" />
-    <circle cx="200" cy="145" r="3" fill="#495057" />
-    {/* Chest Brand Emblem & Text */}
-    <path d="M235 180 L245 165 L255 180 Z M240 180 L240 195" stroke="#b59410" strokeWidth="2" fill="none" />
-    <text x="245" y="210" fill="#b59410" fontSize="11" fontFamily="serif" fontWeight="bold">REALCENOVA</text>
-  </svg>
-);
-
-const CowboyFrontBackSVG = () => (
-  <svg viewBox="0 0 800 400" className="w-full h-full bg-neutral-900">
-    <rect width="800" height="400" fill="#0a0a0a" />
-    {/* FRONT SIDE */}
-    <g transform="translate(20, 10)">
-      <text x="180" y="45" fill="#6c757d" fontSize="14" letterSpacing="4" textAnchor="middle">FRONT</text>
-      <path d="M70 90 L110 60 L250 60 L290 90 L340 130 L300 170 L280 150 L280 350 L80 350 L80 150 L60 170 L20 130 Z" fill="#ffffff" />
-      <text x="180" y="210" fill="#b59410" fontSize="18" fontFamily="serif" letterSpacing="3" textAnchor="middle" fontWeight="bold">REALCENOVA</text>
-    </g>
-    {/* BACK SIDE */}
-    <g transform="translate(420, 10)">
-      <text x="180" y="45" fill="#6c757d" fontSize="14" letterSpacing="4" textAnchor="middle">BACK</text>
-      <path d="M70 90 L110 60 L250 60 L290 90 L340 130 L300 170 L280 150 L280 350 L80 350 L80 150 L60 170 L20 130 Z" fill="#ffffff" />
-      {/* Cowboy Graphic Silhouette */}
-      <circle cx="180" cy="180" r="55" fill="#1a1a1a" />
-      <path d="M140 160 Q180 130 220 160 Q180 150 140 160 Z" fill="#b59410" />
-      <path d="M145 175 C145 160 215 160 215 175 L205 220 L155 220 Z" fill="#2b2b2b" />
-      <path d="M130 140 L210 220 M140 130 L220 210" stroke="#b59410" strokeWidth="4" strokeLinecap="round" />
-    </g>
-  </svg>
-);
-
-const RoundNeckSVG = () => (
-  <svg viewBox="0 0 400 400" className="w-full h-full bg-neutral-900">
-    <rect width="400" height="400" fill="#0d0d0d" />
-    <path d="M100 100 Q200 130 300 100 L340 140 L300 180 L280 160 L280 340 L120 340 L120 160 L100 180 L60 140 Z" fill="#f8f9fa" />
-    <path d="M160 100 Q200 135 240 100 Q200 115 160 100 Z" fill="#e9ecef" stroke="#ced4da" strokeWidth="1" />
-    <text x="200" y="210" fill="#b59410" fontSize="16" fontFamily="serif" letterSpacing="2" textAnchor="middle" fontWeight="bold">REALCENOVA</text>
-  </svg>
-);
-
 const INITIAL_PRODUCTS = [
   {
     id: 1,
     name: 'REALCENOVA Leather Slides (Gold Emblem)',
     price: 750.00,
     category: 'Footwear',
-    imageType: 'slides-gold',
-    image: 'https://lh3.googleusercontent.com/d/11fJbgsvzLFUpPv977OHwq98gN_ns6b5z',
+    image: '/slides-gold.jpg',
     hasOptions: true,
     sizes: ['5', '6', '7', '8', '9', '10', '11']
   },
@@ -65,8 +16,7 @@ const INITIAL_PRODUCTS = [
     name: 'REALCENOVA Leather Slides (Stitched Patch)',
     price: 750.00,
     category: 'Footwear',
-    imageType: 'slides-patch',
-    image: 'https://lh3.googleusercontent.com/d/1INdiML6Z7pslhVyYN6kBFMqH2Rs--54S',
+    image: '/slides-patch.jpg',
     hasOptions: true,
     sizes: ['5', '6', '7', '8', '9', '10', '11']
   },
@@ -75,7 +25,7 @@ const INITIAL_PRODUCTS = [
     name: 'REALCENOVA Golf T-Shirt (Buttoned Polo)',
     price: 559.99,
     category: 'Apparel',
-    imageType: 'golf-polo',
+    image: '/golf-polo.jpg',
     hasOptions: true,
     colors: ['White', 'Black', 'Navy', 'Off-White'],
     sizes: ['S', 'M', 'L', 'XL', 'XXL']
@@ -85,7 +35,7 @@ const INITIAL_PRODUCTS = [
     name: 'REALCENOVA Round Neck T-Shirt',
     price: 449.99,
     category: 'Apparel',
-    imageType: 'round-neck',
+    image: '/round-neck.jpg',
     hasOptions: true,
     colors: ['White', 'Black', 'Navy', 'Grey'],
     sizes: ['S', 'M', 'L', 'XL', 'XXL']
@@ -95,7 +45,7 @@ const INITIAL_PRODUCTS = [
     name: 'REALCENOVA "Cowboy" Front & Back T-Shirt',
     price: 449.99,
     category: 'Apparel',
-    imageType: 'cowboy-front-back',
+    image: '/cowboy-tee.jpg',
     hasOptions: true,
     colors: ['White'],
     sizes: ['S', 'M', 'L', 'XL', 'XXL']
@@ -105,7 +55,7 @@ const INITIAL_PRODUCTS = [
     name: 'REALCENOVA Gold Watch',
     price: 1900.00,
     category: 'Watches',
-    image: 'https://lh3.googleusercontent.com/d/1zbZzfsA1LQzxO005N93aYLjuLiSKnhHK',
+    image: '/gold-watch.jpg',
     hasOptions: false
   },
   {
@@ -113,7 +63,7 @@ const INITIAL_PRODUCTS = [
     name: 'REALCENOVA Classic Denim Jeans (Blue)',
     price: 1300.00,
     category: 'Apparel',
-    image: 'https://lh3.googleusercontent.com/d/1v1nmaNrfAp7ZDZZU2cG2T6kNyzuTyN7u',
+    image: '/jeans-blue.jpg',
     hasOptions: true,
     colors: ['Blue'],
     sizes: ['28', '30', '32', '34', '36']
@@ -123,26 +73,12 @@ const INITIAL_PRODUCTS = [
     name: 'REALCENOVA Classic Denim Jeans (Black)',
     price: 1300.00,
     category: 'Apparel',
-    image: 'https://lh3.googleusercontent.com/d/1pdUt7tFp7aGNI37vUG5gPXcEt9d7eZ9u',
+    image: '/jeans-black.jpg',
     hasOptions: true,
     colors: ['Black'],
     sizes: ['28', '30', '32', '34', '36']
   }
 ];
-
-function ProductDisplayImage({ product }) {
-  if (product.imageType === 'golf-polo') return <GolfPoloSVG />;
-  if (product.imageType === 'cowboy-front-back') return <CowboyFrontBackSVG />;
-  if (product.imageType === 'round-neck') return <RoundNeckSVG />;
-
-  return (
-    <img
-      src={product.image}
-      alt={product.name}
-      className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
-    />
-  );
-}
 
 export default function App() {
   const [view, setView] = useState('store');
@@ -152,9 +88,9 @@ export default function App() {
   const [storeUrl, setStoreUrl] = useState('https://realcenova-store.vercel.app');
   const [adminTab, setAdminTab] = useState('orders');
 
-  // Clear stale local storage once to force clean sync
+  // Forced cache flush: resets localStorage so all 8 items reload clean
   const [products, setProducts] = useState(() => {
-    localStorage.removeItem('realcenova_products');
+    localStorage.clear();
     return INITIAL_PRODUCTS;
   });
 
@@ -162,11 +98,9 @@ export default function App() {
     localStorage.setItem('realcenova_products', JSON.stringify(products));
   }, [products]);
 
-  // Inline Price Editing State
   const [editingProductId, setEditingProductId] = useState(null);
   const [editingPriceInput, setEditingPriceInput] = useState('');
 
-  // Persistent Orders & Notification State
   const [orders, setOrders] = useState(() => {
     const saved = localStorage.getItem('realcenova_orders');
     return saved ? JSON.parse(saved) : [];
@@ -178,16 +112,13 @@ export default function App() {
 
   const unreadCount = orders.filter(o => !o.read).length;
 
-  // Customer Auth State
   const [customer, setCustomer] = useState(null);
   const [authMode, setAuthMode] = useState('login');
   const [authForm, setAuthForm] = useState({ name: '', email: '', password: '' });
 
-  // Options State for Apparel & Footwear Selection
   const [selectedSizes, setSelectedSizes] = useState({});
   const [selectedColors, setSelectedColors] = useState({});
 
-  // Cart & Checkout State
   const [cart, setCart] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
@@ -208,7 +139,6 @@ export default function App() {
 
   const [newProduct, setNewProduct] = useState({ name: '', price: '', category: '', image: '' });
 
-  // Cart Handlers
   const addToCart = (product) => {
     const size = selectedSizes[product.id] || (product.sizes ? product.sizes[0] : '');
     const color = selectedColors[product.id] || (product.colors ? product.colors[0] : '');
@@ -230,7 +160,6 @@ export default function App() {
   const cartTotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
   const cartCount = cart.reduce((sum, item) => sum + item.qty, 0);
 
-  // Customer Auth Handlers
   const handleAuth = (e) => {
     e.preventDefault();
     if (authMode === 'signup') {
@@ -245,7 +174,6 @@ export default function App() {
     setView('store');
   };
 
-  // Admin Login & Management
   const handleAdminLogin = (e) => {
     e.preventDefault();
     if (adminUser === 'admin' && adminPass === 'realcenova123') {
@@ -320,7 +248,6 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-black text-white selection:bg-neutral-800 relative">
-      {/* Navigation Header */}
       <header className="border-b border-neutral-900 sticky top-0 z-40 bg-black/80 backdrop-blur-md px-6 py-4 flex justify-between items-center">
         <h1 className="text-xl font-light tracking-[0.3em] cursor-pointer" onClick={() => setView('store')}>REALCENOVA</h1>
         <nav className="flex items-center gap-6 text-sm tracking-widest uppercase">
@@ -366,9 +293,7 @@ export default function App() {
         </nav>
       </header>
 
-      {/* Main Content Area */}
       <main className="max-w-7xl mx-auto px-6 py-12">
-        {/* Store Catalog View */}
         {view === 'store' && (
           <div>
             <div className="text-center mb-16">
@@ -380,14 +305,13 @@ export default function App() {
                 <div key={p.id} className="border border-neutral-900 bg-neutral-950/50 group overflow-hidden flex flex-col justify-between">
                   <div>
                     <div className="h-80 overflow-hidden bg-neutral-900">
-                      <ProductDisplayImage product={p} />
+                      <img src={p.image} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
                     </div>
                     <div className="p-6">
                       <span className="text-xs text-neutral-500 tracking-widest uppercase">{p.category}</span>
                       <h3 className="text-lg font-light tracking-wide mt-1">{p.name}</h3>
                       <p className="text-neutral-300 mt-2 font-medium">R {p.price.toFixed(2)}</p>
 
-                      {/* Customization Options */}
                       {p.hasOptions && (
                         <div className="mt-4 space-y-3 pt-4 border-t border-neutral-900">
                           {p.colors && (
@@ -441,7 +365,6 @@ export default function App() {
           </div>
         )}
 
-        {/* Customer Account Sign In / Sign Up */}
         {view === 'account' && (
           <div className="max-w-md mx-auto border border-neutral-900 p-8 bg-neutral-950">
             <h2 className="text-xl font-light tracking-widest mb-2 text-center uppercase">
@@ -482,7 +405,6 @@ export default function App() {
           </div>
         )}
 
-        {/* Store QR View */}
         {view === 'qr' && (
           <div className="max-w-xl mx-auto text-center border border-neutral-900 p-8 bg-neutral-950">
             <h2 className="text-2xl font-light tracking-widest mb-4">BRAND STORE QR CODE</h2>
@@ -497,7 +419,6 @@ export default function App() {
           </div>
         )}
 
-        {/* Admin Login Portal */}
         {view === 'admin' && !isAdmin && (
           <div className="max-w-md mx-auto border border-neutral-900 p-8 bg-neutral-950">
             <h2 className="text-xl font-light tracking-widest mb-6 text-center">ADMIN PORTAL</h2>
@@ -515,7 +436,6 @@ export default function App() {
           </div>
         )}
 
-        {/* Admin Dashboard: Orders Notification Center & Inventory Price Editor */}
         {view === 'admin' && isAdmin && (
           <div>
             <div className="flex justify-between items-center mb-8 border-b border-neutral-900 pb-4">
@@ -547,7 +467,6 @@ export default function App() {
               </button>
             </div>
 
-            {/* TAB 1: Customer Orders Slot */}
             {adminTab === 'orders' && (
               <div className="space-y-6">
                 <div className="flex justify-between items-center">
@@ -650,7 +569,6 @@ export default function App() {
               </div>
             )}
 
-            {/* TAB 2: Inventory & Live Price Editor Slot */}
             {adminTab === 'inventory' && (
               <div>
                 <div className="mb-6 bg-neutral-900/50 border border-neutral-800 p-4 text-xs text-neutral-300">
@@ -681,13 +599,10 @@ export default function App() {
                   {products.map(p => (
                     <div key={p.id} className="border border-neutral-900 p-4 flex justify-between items-center bg-neutral-950">
                       <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 bg-neutral-900 overflow-hidden">
-                          <ProductDisplayImage product={p} />
-                        </div>
+                        <img src={p.image} alt={p.name} className="w-14 h-14 object-cover bg-neutral-900" />
                         <div>
                           <h4 className="font-light tracking-wide">{p.name}</h4>
                           
-                          {/* Live Price Editor */}
                           {editingProductId === p.id ? (
                             <div className="flex items-center gap-2 mt-1">
                               <span className="text-xs text-neutral-400">R</span>
@@ -726,7 +641,6 @@ export default function App() {
         )}
       </main>
 
-      {/* Slide-out Cart Drawer */}
       {isCartOpen && (
         <div className="fixed inset-0 z-50 flex justify-end bg-black/70 backdrop-blur-sm">
           <div className="w-full max-w-md bg-neutral-950 h-full border-l border-neutral-900 flex flex-col p-6">
@@ -741,9 +655,7 @@ export default function App() {
               ) : (
                 cart.map(item => (
                   <div key={item.cartItemId} className="flex gap-4 border-b border-neutral-900 pb-4 items-center">
-                    <div className="w-16 h-16 bg-neutral-900 overflow-hidden shrink-0">
-                      <ProductDisplayImage product={item} />
-                    </div>
+                    <img src={item.image} alt={item.name} className="w-16 h-16 object-cover bg-neutral-900" />
                     <div className="flex-1">
                       <h4 className="text-sm font-light">{item.name}</h4>
                       {(item.selectedColor || item.selectedSize) && (
@@ -777,7 +689,6 @@ export default function App() {
         </div>
       )}
 
-      {/* Checkout, Delivery & EFT Payment Modal */}
       {isCheckoutOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md overflow-y-auto">
           <div className="max-w-2xl w-full bg-neutral-950 border border-neutral-900 p-8 my-8 relative">
